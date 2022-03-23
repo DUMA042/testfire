@@ -131,14 +131,10 @@ fun Greeting(name: String, auth: FirebaseAuth?, context:ComponentActivity,onclic
                     text = "Google sign in failed"
                 } else {
                     coroutineScope.launch {
-                        account.email?.let {
-                            account.displayName?.let { it1 ->
-                                authViewModel.signIn(
-                                    email = it,
-                                    displayName = it1,
-                                )
-                            }
-                        }
+                        authViewModel.signIn(
+                            email = account.email,
+                            displayName = account.displayName,
+                        )
                     }
                 }
             } catch (e: ApiException) {
