@@ -11,7 +11,7 @@ class AuthViewModel:ViewModel() {
     val user: StateFlow<User?> = _user
 
     suspend fun signIn(email: String?, displayName: String?) {
-        delay(2000) // Simulating network call
+         // Simulating network call
         _user.value = User(email, displayName)
     }
 }
