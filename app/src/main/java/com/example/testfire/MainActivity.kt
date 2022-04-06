@@ -34,6 +34,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.launch
 
 
@@ -127,15 +128,14 @@ fun Greeting(name: String, auth: FirebaseAuth?, context:ComponentActivity,onclic
         rememberLauncherForActivityResult(contract = AuthResultContract()) { task ->
             try {
                 val account = task?.getResult(ApiException::class.java)
+
                 if (account == null) {
                     text = "Google sign in failed"
                 } else {
-                    coroutineScope.launch {
-                        authViewModel.signIn(
-                            email = account.email,
-                            displayName = account.displayName,
-                        )
-                    }
+                    val credential=GoogleAuthProvider.getCredential(account?.idToken,null)
+                    auth?.signInWithCredential(credential)
+
+
                 }
             } catch (e: ApiException) {
                 text = "Google sign in failed"
