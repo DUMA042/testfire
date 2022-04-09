@@ -1,6 +1,5 @@
 package com.example.testfire
 
-import android.app.Activity
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.os.Bundle
@@ -8,8 +7,6 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,23 +19,22 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
 import com.example.testfire.Authpack.AuthResultContract
+import com.example.testfire.UIElement.UserDataDisplay
 import com.example.testfire.ViewModels.AuthViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.GoogleAuthProvider
-import kotlinx.coroutines.launch
 
 
 const val RC_SIGN_IN=0
+var signInStatus:Boolean=false
 class MainActivity : ComponentActivity() {
     private val authViewModel: AuthViewModel by viewModels()
     /**
@@ -53,6 +49,27 @@ class MainActivity : ComponentActivity() {
 
 
         super.onCreate(savedInstanceState)
+
+        /**setContent {
+            TestfireTheme {
+                // A surface container using the 'background' color from the theme
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colors.background
+                ) {
+                    Greeting("Android",auth,this,{},authViewModel)
+                }
+            }
+        }**/
+
+    }
+
+
+
+    public override fun onStart() {
+        super.onStart()
+        //This check If the USer is LogIn and makes the Value signInStatus=True if user is Login
+        CheckLogInStaus()
         setContent {
             TestfireTheme {
                 // A surface container using the 'background' color from the theme
@@ -64,26 +81,27 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-
-
-
-    public override fun onStart() {
-        super.onStart()
         // Check if user is signed in (non-null) and update UI accordingly.
-        val currentUser = auth?.currentUser
-        if(currentUser != null){
-           // reload();
-            Log.d(TAG,"YOU ARE LOG IN")
 
-        }
     }
 
 
 
+fun CheckLogInStaus(){
 
+    val currentUser = auth?.currentUser
+    if(currentUser != null){
+        // reload();
+
+        Log.d(TAG,"YOU ARE LOG IN ${currentUser.displayName} ")
+        signInStatus=true
+
+    }
 
 }
+
+}
+
 
 fun getGoogleSignInClient(context: Context): GoogleSignInClient {
     val signInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -120,8 +138,10 @@ fun Enter(){
 @Composable
 fun Greeting(name: String, auth: FirebaseAuth?, context:ComponentActivity,onclick:()->Unit,authViewModel:AuthViewModel) {
     val coroutineScope = rememberCoroutineScope()
+    var userLogin by rememberSaveable{mutableStateOf(signInStatus)}
     var text by remember { mutableStateOf<String?>(null) }
     val user by remember(authViewModel) { authViewModel.user }.collectAsState()
+    var userDisplaylogin:String
     val signInRequestCode = 1
 
     val authResultLauncher =
@@ -142,20 +162,28 @@ fun Greeting(name: String, auth: FirebaseAuth?, context:ComponentActivity,onclic
             }
         }
 
-    buildUI("Android",auth, context,  onClick = { authResultLauncher.launch(RC_SIGN_IN)},authViewModel)
+    ///////////////////////////////////////
+    if(userLogin){
+      userDisplaylogin="You'r LogIn"
+      HomeScreen(LoginDisplayStaus =userDisplaylogin,onSignOut={userLogin=false}, auth)
+    }
+    else{
+        userDisplaylogin="Not Login"
+        buildUI(userDisplaylogin,auth, context,  onClick = { authResultLauncher.launch(RC_SIGN_IN)},authViewModel,onLogin={userLogin=true})
+    }
 
 
 
-   
 }
 
 @Composable
-fun buildUI(name: String, auth: FirebaseAuth?, context:ComponentActivity,onClick:()->Unit,authViewModel:AuthViewModel){
+fun buildUI(LoginDisplayStaus: String, auth: FirebaseAuth?, context:ComponentActivity, onClick:()->Unit, authViewModel:AuthViewModel, onLogin:()->Unit){
 
     Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
 
-        Text(text = "Hello $name!")
-        Button(onClick = {createAccount("vv@ggmail.com","ddffttggh",auth,context)}) {
+        Text(text = "$LoginDisplayStaus!")
+        Button(onClick = {createAccount("vv@ggmail.com","ddffttggh",auth,context)
+                          onLogin()}) {
             Text(text = "Login")
         }
         Spacer(modifier = Modifier.padding(3.dp))
@@ -176,14 +204,25 @@ fun buildUI(name: String, auth: FirebaseAuth?, context:ComponentActivity,onClick
 
             Text(text = "Sign in with Google", modifier = Modifier.padding(6.dp))
         }
-        Spacer(modifier = Modifier.padding(3.dp))
-        Button(onClick = {Firebase.auth.signOut()}) {
-            Text(text = "signout")
-        }
+
 
     }
 }
 
+@Composable
+fun HomeScreen(LoginDisplayStaus: String, onSignOut:()->Unit, auth: FirebaseAuth?){
+    Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+        Text("$LoginDisplayStaus!")
+        Spacer(modifier = Modifier.padding(3.dp))
+        Button(onClick = {Firebase.auth.signOut()
+            onSignOut()}) {
+            Text(text = "signout")
+        }
+        UserDataDisplay(currentUser =auth?.currentUser )
+
+    }
+
+}
 
 /*
 @Preview(showBackground = true)
