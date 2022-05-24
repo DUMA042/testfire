@@ -4,6 +4,7 @@ import android.content.ContentValues.TAG
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -17,11 +18,13 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.White
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.testfire.Authpack.AuthResultContract
 import com.example.testfire.UIElement.UserDataDisplay
@@ -35,7 +38,9 @@ import com.google.firebase.auth.GoogleAuthProvider
 
 const val RC_SIGN_IN=0
 var signInStatus:Boolean=false
+
 class MainActivity : ComponentActivity() {
+
     private val authViewModel: AuthViewModel by viewModels()
     /**
     var activityResultLauncher: ActivityResultLauncher<Intent> =registerForActivityResult(
@@ -82,7 +87,6 @@ class MainActivity : ComponentActivity() {
             }
         }
         // Check if user is signed in (non-null) and update UI accordingly.
-
     }
 
 
@@ -120,11 +124,13 @@ fun createAccount(email:String,password:String,auth:FirebaseAuth?,context:Compon
         if (task.isSuccessful) {
             // Sign in success, update UI with the signed-in user's information
             Log.d(TAG, "createUserWithEmail:success")
+            Toast.makeText(context, "createUserWithEmail:success", Toast.LENGTH_LONG)
             val user = auth?.currentUser
             //updateUI(user)
         } else {
             // If sign in fails, display a message to the user.
             Log.w(TAG, "createUserWithEmail:failure", task.exception)
+             Toast.makeText(context, "createUserWithEmail:failure", Toast.LENGTH_LONG)
             /* Toast.makeText("tyhh", "Authentication failed.",
                 Toast.LENGTH_SHORT).show()*/
             // updateUI(null)
@@ -141,7 +147,7 @@ fun Greeting(name: String, auth: FirebaseAuth?, context:ComponentActivity,onclic
     var userLogin by rememberSaveable{mutableStateOf(signInStatus)}
     var text by remember { mutableStateOf<String?>(null) }
     val user by remember(authViewModel) { authViewModel.user }.collectAsState()
-    var userDisplaylogin:String
+    var userDisplaylogin by rememberSaveable{mutableStateOf("")}
     val signInRequestCode = 1
 
     val authResultLauncher =
@@ -186,11 +192,13 @@ fun buildUI(LoginDisplayStaus: String, auth: FirebaseAuth?, context:ComponentAct
                           onLogin()}) {
             Text(text = "Login")
         }
-        Spacer(modifier = Modifier.padding(3.dp))
 
+        Spacer(modifier = Modifier.padding(3.dp))
+/**Button for the Google Log IN **/
         Button(
             onClick = {
               onClick()
+              onLogin()
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -205,22 +213,48 @@ fun buildUI(LoginDisplayStaus: String, auth: FirebaseAuth?, context:ComponentAct
             Text(text = "Sign in with Google", modifier = Modifier.padding(6.dp))
         }
 
+        Spacer(modifier = Modifier.padding(3.dp))
+        Button(
+            onClick = {
+
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp),
+            shape = RoundedCornerShape(6.dp),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Black,
+                contentColor = White
+            )
+        ) {
+
+            Text(text = "Go to next space", modifier = Modifier.padding(6.dp))
+        }
+
 
     }
 }
 
 @Composable
 fun HomeScreen(LoginDisplayStaus: String, onSignOut:()->Unit, auth: FirebaseAuth?){
-    Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("$LoginDisplayStaus!")
-        Spacer(modifier = Modifier.padding(3.dp))
-        Button(onClick = {Firebase.auth.signOut()
-            onSignOut()}) {
-            Text(text = "signout")
-        }
-        UserDataDisplay(currentUser =auth?.currentUser )
+    var text by remember{ mutableStateOf("")}
+    Column(){
+        TextField(value = text,keyboardOptions = KeyboardOptions(keyboardType=KeyboardType.Text) ,onValueChange ={text=it}, label = {Text("Data to change")})
+        Spacer(modifier = Modifier.padding(5.dp))
+        Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+            Text("$LoginDisplayStaus!")
+            Spacer(modifier = Modifier.padding(3.dp))
+            Button(onClick = {Firebase.auth.signOut()
+                onSignOut()}) {
+                /**This is for the Sign out button*/
 
+                Text(text = "signout")
+            }
+            UserDataDisplay(currentUser =auth?.currentUser )
+
+        }
     }
+
 
 }
 
