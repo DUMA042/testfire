@@ -34,6 +34,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.ktx.firestore
+import okio.Source
 
 
 const val RC_SIGN_IN=0
@@ -47,10 +49,12 @@ class MainActivity : ComponentActivity() {
         ActivityResultContracts.StartActivityForResult(), ActivityResultCallback<ActivityResult>)**/
 
     private lateinit var auth: FirebaseAuth
+    private lateinit var dataStore:Firebase
     private var TAG1:String="W"
     override fun onCreate(savedInstanceState: Bundle?) {
         // Initialize Firebase Auth
         auth = Firebase.auth
+
 
 
         super.onCreate(savedInstanceState)
@@ -104,6 +108,29 @@ fun CheckLogInStaus(){
 
 }
 
+}
+/**To get data**/
+fun getdata(documentloc:String){
+    val docRef=Firebase.firestore.collection("data")
+    docRef.whereEqualTo("Name","Ben").get().addOnSuccessListener { documents->
+        for(document in documents){
+            Log.d("yuu","It works ${document.data} and the ID is ${document.id}")
+        }
+    }
+    /**
+val docRef=Firebase.firestore.collection("data").document(documentloc)
+docRef.get()
+    .addOnSuccessListener { document->
+        if(document!=null){
+            Log.d("yuu","It works ${document.data}")
+        }
+        else{
+            Log.d("yuue","it failed")
+        }
+    }.addOnFailureListener{exception->
+        Log.d("yuur","it failed to get data")
+    }
+**/
 }
 
 
@@ -216,7 +243,7 @@ fun buildUI(LoginDisplayStaus: String, auth: FirebaseAuth?, context:ComponentAct
         Spacer(modifier = Modifier.padding(3.dp))
         Button(
             onClick = {
-
+             onLogin()
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -240,6 +267,23 @@ fun HomeScreen(LoginDisplayStaus: String, onSignOut:()->Unit, auth: FirebaseAuth
     var text by remember{ mutableStateOf("")}
     Column(){
         TextField(value = text,keyboardOptions = KeyboardOptions(keyboardType=KeyboardType.Text) ,onValueChange ={text=it}, label = {Text("Data to change")})
+        Button(
+            onClick = {
+                getdata(text);
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp),
+            shape = RoundedCornerShape(6.dp),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Black,
+                contentColor = White
+            )
+        ) {
+
+            Text(text = "Send request for data", modifier = Modifier.padding(6.dp))
+        }
+
         Spacer(modifier = Modifier.padding(5.dp))
         Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
             Text("$LoginDisplayStaus!")
