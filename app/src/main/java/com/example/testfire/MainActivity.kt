@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.testfire.Authpack.AuthResultContract
+import com.example.testfire.NavComponent.NavGraphpackage.MainScreen
 import com.example.testfire.UIElement.UserDataDisplay
 import com.example.testfire.ViewModels.AuthViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -82,6 +83,10 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
+                    if(auth?.currentUser!=null){
+                        MainScreen()
+                    }
+                    else
                     Greeting("Android",auth,this,{},authViewModel)
                 }
             }
