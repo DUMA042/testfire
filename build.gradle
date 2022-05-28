@@ -1,6 +1,7 @@
 buildscript {
     ext {
         compose_version = '1.1.1'
+        nav_version = "2.4.2"
     }
     repositories {
         // Check that you have the following line (if not, add it):
