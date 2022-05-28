@@ -83,7 +83,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    if(auth?.currentUser!=null){
+                    if(auth?.currentUser==null){
                         MainScreen()
                     }
                     else

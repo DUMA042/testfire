@@ -16,6 +16,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.testfire.NavComponent.NavTypes.NavScreens
+import com.example.testfire.UIElement.PatientUIForVacineQ.PatientHomeScreenStatefull
 
 @Composable
 fun NavigationGraph(navController: NavHostController){
@@ -74,7 +75,7 @@ fun RowScope.AddItem(screen: NavScreens, currentDestination: NavDestination?, na
 
 @Composable
 fun HomeScreen(){
-    Text("On the Home Screen")
+    PatientHomeScreenStatefull()
 }
 
 
