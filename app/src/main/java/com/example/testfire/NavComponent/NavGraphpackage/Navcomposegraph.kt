@@ -17,12 +17,13 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.testfire.NavComponent.NavTypes.NavScreens
 import com.example.testfire.UIElement.PatientUIForVacineQ.PatientHomeScreenStatefull
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun NavigationGraph(navController: NavHostController){
+fun NavigationGraph(navController: NavHostController,auth: FirebaseAuth?,onSignOut:()->Unit){
     NavHost(navController = navController, startDestination = NavScreens.HomeScreen.route){
         composable(route= NavScreens.HomeScreen.route){
-            HomeScreen()
+            HomeScreen(auth,onSignOut)
         }
         composable(route = NavScreens.PatientDetailScreen.route){
             PatientDetailScreen()
@@ -36,15 +37,16 @@ fun NavigationGraph(navController: NavHostController){
 
 
 @Composable
-fun MainScreen(){
+fun MainScreen(auth: FirebaseAuth?,onSignOut:()->Unit){
     val navController = rememberNavController()
     Scaffold(
         bottomBar = { Bottombar(navController = navController) }
     ) {
-        NavigationGraph(navController = navController)
+        NavigationGraph(navController = navController,auth,onSignOut)
     }
 
 }
+
 
 
 @Composable
@@ -59,7 +61,6 @@ fun Bottombar(navController: NavController){
             AddItem(screen = screen, currentDestination = currentdestination, navController =navController )
         }
     }
-
 }
 
 
@@ -74,8 +75,8 @@ fun RowScope.AddItem(screen: NavScreens, currentDestination: NavDestination?, na
 }
 
 @Composable
-fun HomeScreen(){
-    PatientHomeScreenStatefull()
+fun HomeScreen(auth: FirebaseAuth?,onSignOut:()->Unit){
+    PatientHomeScreenStatefull(auth,onSignOut)
 }
 
 

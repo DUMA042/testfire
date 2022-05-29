@@ -9,33 +9,41 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.testfire.ui.theme.TestfireTheme
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Black
 import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.testfire.Authpack.AuthResultContract
 import com.example.testfire.NavComponent.NavGraphpackage.MainScreen
 import com.example.testfire.UIElement.UserDataDisplay
 import com.example.testfire.ViewModels.AuthViewModel
 import com.example.testfire.ViewModels.PatientDetailViewModel
+import com.example.testfire.ui.theme.TestfireTheme
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 const val RC_SIGN_IN=0
@@ -52,7 +60,9 @@ class MainActivity : ComponentActivity() {
     private var TAG1:String="W"
     override fun onCreate(savedInstanceState: Bundle?) {
         // Initialize Firebase Auth
-        auth = Firebase.auth
+
+            auth = Firebase.auth
+
 
 
         super.onCreate(savedInstanceState)
@@ -66,7 +76,10 @@ class MainActivity : ComponentActivity() {
     public override fun onStart() {
         super.onStart()
         //This check If the USer is LogIn and makes the Value signInStatus=True if user is Login
-        CheckLogInStaus()
+
+
+
+
         setContent {
             TestfireTheme {
                 // A surface container using the 'background' color from the theme
@@ -74,12 +87,19 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    if(auth?.currentUser!=null ){
+                    var getloading by rememberSaveable{mutableStateOf(true)}
 
-                        MainScreen()
-                    }
-                    else
-                    Greeting("Android",auth,this,{},authViewModel,patientviewmodeldetails)
+                    varifyLogInStaus()
+                    Greeting(auth,this,authViewModel)
+
+
+                    //CircularProgressAnimated()
+
+
+
+
+
+
                 }
             }
         }
@@ -88,7 +108,8 @@ class MainActivity : ComponentActivity() {
 
 
 
-fun CheckLogInStaus(){
+
+ fun varifyLogInStaus(){
 
     val currentUser = auth?.currentUser
 
@@ -99,11 +120,15 @@ fun CheckLogInStaus(){
         Log.d(TAG,"YOU ARE LOG IN ${currentUser.displayName} ")
         signInStatus=true
 
+
     }
 
+
 }
 
 }
+
+
 
 
 fun getGoogleSignInClient(context: Context): GoogleSignInClient {
@@ -136,18 +161,69 @@ fun createAccount(email:String,password:String,auth:FirebaseAuth?,context:Compon
         }
     }
 }
+
+
+//This is for SnakBar may be used if not will be deleted
+@Composable
+fun justforsnakbar(){
+    val scaffoldState = rememberScaffoldState()
+    val scope = rememberCoroutineScope()
+    Scaffold(
+        scaffoldState = scaffoldState,
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                text = { Text("Show snackbar") },
+                onClick = {
+                    scope.launch {
+                        scaffoldState.snackbarHostState
+                            .showSnackbar("Snackbar")
+                    }
+                }
+            )
+        }
+    ) {
+        // Screen content
+        Text("Working")
+    }
+}
+
+//This is for the Circular Progress Bar
+@Composable
+private fun CircularProgressAnimated(){
+    val progressValue = 0.75f
+    val infiniteTransition = rememberInfiniteTransition()
+
+    val progressAnimationValue by infiniteTransition.animateFloat(
+        initialValue = 0.0f,
+        targetValue = progressValue,animationSpec = infiniteRepeatable(animation = tween(900)))
+    Column(modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally)
+    {
+
+        CircularProgressIndicator(progress = progressAnimationValue, modifier = Modifier
+            .width(30.dp)
+            .height(30.dp))
+
+    }
+
+}
+
+
+
+
 @Composable
 fun Enter(){
     Text(text = "You are signed in already")
 }
+
 @Composable
-fun Greeting(name: String, auth: FirebaseAuth?, context:ComponentActivity,onclick:()->Unit,authViewModel:AuthViewModel,patientviewmodeldetails:PatientDetailViewModel) {
+fun Greeting(auth: FirebaseAuth?, context:ComponentActivity,authViewModel:AuthViewModel) {
     val coroutineScope = rememberCoroutineScope()
     var userLogin by rememberSaveable{mutableStateOf(signInStatus)}
-    var text by remember { mutableStateOf<String?>(null) }
     val user by remember(authViewModel) { authViewModel.user }.collectAsState()
 
-    auth?.currentUser?.let { patientviewmodeldetails.setPatientDetails(it) }
+    //auth?.currentUser?.let { patientviewmodeldetails.setPatientDetails(it) }
 
     var userDisplaylogin by rememberSaveable{mutableStateOf("")}
     val signInRequestCode = 1
@@ -158,51 +234,54 @@ fun Greeting(name: String, auth: FirebaseAuth?, context:ComponentActivity,onclic
                 val account = task?.getResult(ApiException::class.java)
 
                 if (account == null) {
-                    text = "Google sign in failed"
+                   // Toast.makeText(context, "Sign In Failed", Toast.LENGTH_LONG)
+                    userLogin=false
+
                 } else {
-                    val credential=GoogleAuthProvider.getCredential(account?.idToken,null)
-                    auth?.signInWithCredential(credential)
+
+                        val credential=GoogleAuthProvider.getCredential(account?.idToken,null)
+                        auth?.signInWithCredential(credential)
+                      //  Toast.makeText(context, "Sign In SuccessFull", Toast.LENGTH_LONG)
+                        userLogin=true
 
 
                 }
             } catch (e: ApiException) {
-                text = "Google sign in failed"
+               // Toast.makeText(context, "Error: Sign In Failed", Toast.LENGTH_LONG)
+                userLogin=false
             }
         }
 
     ///////////////////////////////////////
     if(userLogin){
-      userDisplaylogin="You'r LogIn"
-      //HomeScreen(LoginDisplayStaus =userDisplaylogin,onSignOut={userLogin=false}, auth)
-
-
+      MainScreen(auth,onSignOut={userLogin=false})
     }
     else{
-        userDisplaylogin="Not Login"
-        buildUI(userDisplaylogin,auth, context,  onClick = { authResultLauncher.launch(RC_SIGN_IN)},authViewModel,onLogin={userLogin=true})
+
+        buildUI(onClick = { authResultLauncher.launch(RC_SIGN_IN)})
     }
 
 
 
 }
 
+/**This is for the Sign In page when the user has not been authenticated **/
 @Composable
-fun buildUI(LoginDisplayStaus: String, auth: FirebaseAuth?, context:ComponentActivity, onClick:()->Unit, authViewModel:AuthViewModel, onLogin:()->Unit){
+fun buildUI(onClick:()->Unit){
 
     Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-
+/**
         Text(text = "$LoginDisplayStaus!")
         Button(onClick = {createAccount("vv@ggmail.com","ddffttggh",auth,context)
                           onLogin()}) {
             Text(text = "Login")
         }
-
-        Spacer(modifier = Modifier.padding(3.dp))
+**/
+       // Spacer(modifier = Modifier.padding(3.dp))
 /**Button for the Google Log IN **/
         Button(
             onClick = {
               onClick()
-              onLogin()
             },
             modifier = Modifier
                 .fillMaxWidth()
