@@ -17,7 +17,6 @@ fun SimpleOutlinedTextFieldSample() {
     val keyboardController =  LocalSoftwareKeyboardController.current
     val (focusEmail,focusPassword) = remember { FocusRequester.createRefs()}
 
-
 }
 
 @Preview(showBackground = true)

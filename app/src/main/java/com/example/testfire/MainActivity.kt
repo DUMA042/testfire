@@ -30,6 +30,7 @@ import com.example.testfire.Authpack.AuthResultContract
 import com.example.testfire.NavComponent.NavGraphpackage.MainScreen
 import com.example.testfire.UIElement.UserDataDisplay
 import com.example.testfire.ViewModels.AuthViewModel
+import com.example.testfire.ViewModels.PatientDetailViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -43,9 +44,9 @@ var signInStatus:Boolean=false
 class MainActivity : ComponentActivity() {
 
     private val authViewModel: AuthViewModel by viewModels()
-    /**
-    var activityResultLauncher: ActivityResultLauncher<Intent> =registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult(), ActivityResultCallback<ActivityResult>)**/
+    private val patientviewmodeldetails: PatientDetailViewModel by viewModels()
+
+
 
     private lateinit var auth: FirebaseAuth
     private var TAG1:String="W"
@@ -56,17 +57,7 @@ class MainActivity : ComponentActivity() {
 
         super.onCreate(savedInstanceState)
 
-        /**setContent {
-            TestfireTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    Greeting("Android",auth,this,{},authViewModel)
-                }
-            }
-        }**/
+
 
     }
 
@@ -83,11 +74,12 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    if(auth?.currentUser==null){
+                    if(auth?.currentUser!=null ){
+
                         MainScreen()
                     }
                     else
-                    Greeting("Android",auth,this,{},authViewModel)
+                    Greeting("Android",auth,this,{},authViewModel,patientviewmodeldetails)
                 }
             }
         }
@@ -99,9 +91,11 @@ class MainActivity : ComponentActivity() {
 fun CheckLogInStaus(){
 
     val currentUser = auth?.currentUser
+
     if(currentUser != null){
         // reload();
 
+        currentUser?.let { patientviewmodeldetails.setPatientDetails(it) }
         Log.d(TAG,"YOU ARE LOG IN ${currentUser.displayName} ")
         signInStatus=true
 
@@ -147,11 +141,14 @@ fun Enter(){
     Text(text = "You are signed in already")
 }
 @Composable
-fun Greeting(name: String, auth: FirebaseAuth?, context:ComponentActivity,onclick:()->Unit,authViewModel:AuthViewModel) {
+fun Greeting(name: String, auth: FirebaseAuth?, context:ComponentActivity,onclick:()->Unit,authViewModel:AuthViewModel,patientviewmodeldetails:PatientDetailViewModel) {
     val coroutineScope = rememberCoroutineScope()
     var userLogin by rememberSaveable{mutableStateOf(signInStatus)}
     var text by remember { mutableStateOf<String?>(null) }
     val user by remember(authViewModel) { authViewModel.user }.collectAsState()
+
+    auth?.currentUser?.let { patientviewmodeldetails.setPatientDetails(it) }
+
     var userDisplaylogin by rememberSaveable{mutableStateOf("")}
     val signInRequestCode = 1
 
@@ -176,7 +173,9 @@ fun Greeting(name: String, auth: FirebaseAuth?, context:ComponentActivity,onclic
     ///////////////////////////////////////
     if(userLogin){
       userDisplaylogin="You'r LogIn"
-      HomeScreen(LoginDisplayStaus =userDisplaylogin,onSignOut={userLogin=false}, auth)
+      //HomeScreen(LoginDisplayStaus =userDisplaylogin,onSignOut={userLogin=false}, auth)
+
+
     }
     else{
         userDisplaylogin="Not Login"
