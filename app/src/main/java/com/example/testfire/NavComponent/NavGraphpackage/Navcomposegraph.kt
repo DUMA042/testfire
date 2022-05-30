@@ -7,6 +7,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -17,13 +18,14 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.testfire.NavComponent.NavTypes.NavScreens
 import com.example.testfire.UIElement.PatientUIForVacineQ.PatientHomeScreenStatefull
+import com.example.testfire.ViewModels.PatientDetailViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun NavigationGraph(navController: NavHostController,auth: FirebaseAuth?,onSignOut:()->Unit){
+fun NavigationGraph(navController: NavHostController,auth: FirebaseAuth?,onSignOut:()->Unit,patientDetailViewModel: PatientDetailViewModel){
     NavHost(navController = navController, startDestination = NavScreens.HomeScreen.route){
         composable(route= NavScreens.HomeScreen.route){
-            HomeScreen(auth,onSignOut)
+            HomeScreen(auth,onSignOut,patientDetailViewModel)
         }
         composable(route = NavScreens.PatientDetailScreen.route){
             PatientDetailScreen()
@@ -37,12 +39,12 @@ fun NavigationGraph(navController: NavHostController,auth: FirebaseAuth?,onSignO
 
 
 @Composable
-fun MainScreen(auth: FirebaseAuth?,onSignOut:()->Unit){
+fun MainScreen(auth: FirebaseAuth?,onSignOut:()->Unit,patientDetailViewModel: PatientDetailViewModel){
     val navController = rememberNavController()
     Scaffold(
         bottomBar = { Bottombar(navController = navController) }
     ) {
-        NavigationGraph(navController = navController,auth,onSignOut)
+        NavigationGraph(navController = navController,auth,onSignOut,patientDetailViewModel)
     }
 
 }
@@ -75,8 +77,8 @@ fun RowScope.AddItem(screen: NavScreens, currentDestination: NavDestination?, na
 }
 
 @Composable
-fun HomeScreen(auth: FirebaseAuth?,onSignOut:()->Unit){
-    PatientHomeScreenStatefull(auth,onSignOut)
+fun HomeScreen(auth: FirebaseAuth?,onSignOut:()->Unit,patientDetailViewModel: PatientDetailViewModel){
+    PatientHomeScreenStatefull(auth,onSignOut,patientDetailViewModel)
 }
 
 

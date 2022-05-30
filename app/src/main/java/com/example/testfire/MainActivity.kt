@@ -52,7 +52,7 @@ var signInStatus:Boolean=false
 class MainActivity : ComponentActivity() {
 
     private val authViewModel: AuthViewModel by viewModels()
-    private val patientviewmodeldetails: PatientDetailViewModel by viewModels()
+    private  val patientviewmodeldetails: PatientDetailViewModel by viewModels()
 
 
 
@@ -90,14 +90,10 @@ class MainActivity : ComponentActivity() {
                     var getloading by rememberSaveable{mutableStateOf(true)}
 
                     varifyLogInStaus()
-                    Greeting(auth,this,authViewModel)
+                    Greeting(auth,this,authViewModel,patientviewmodeldetails)
 
 
                     //CircularProgressAnimated()
-
-
-
-
 
 
                 }
@@ -115,8 +111,8 @@ class MainActivity : ComponentActivity() {
 
     if(currentUser != null){
         // reload();
-
-        currentUser?.let { patientviewmodeldetails.setPatientDetails(it) }
+       // patientviewmodeldetails= PatientDetailViewModel(currentUser)
+        //currentUser?.let { patientviewmodeldetails.setPatientDetails(it) }
         Log.d(TAG,"YOU ARE LOG IN ${currentUser.displayName} ")
         signInStatus=true
 
@@ -218,7 +214,7 @@ fun Enter(){
 }
 
 @Composable
-fun Greeting(auth: FirebaseAuth?, context:ComponentActivity,authViewModel:AuthViewModel) {
+fun Greeting(auth: FirebaseAuth?, context:ComponentActivity,authViewModel:AuthViewModel,patientviewmodeldetails:PatientDetailViewModel) {
     val coroutineScope = rememberCoroutineScope()
     var userLogin by rememberSaveable{mutableStateOf(signInStatus)}
     val user by remember(authViewModel) { authViewModel.user }.collectAsState()
@@ -254,7 +250,7 @@ fun Greeting(auth: FirebaseAuth?, context:ComponentActivity,authViewModel:AuthVi
 
     ///////////////////////////////////////
     if(userLogin){
-      MainScreen(auth,onSignOut={userLogin=false})
+      MainScreen(auth,onSignOut={userLogin=false},patientviewmodeldetails)
     }
     else{
 
