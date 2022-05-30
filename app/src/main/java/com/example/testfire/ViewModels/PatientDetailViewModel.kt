@@ -20,7 +20,7 @@ class PatientDetailViewModel: ViewModel()  {
   var patientInfodetailsobject by mutableStateOf(PatientPublicInfo())
     var isNewUser by mutableStateOf(true)
 
-    private lateinit var patientDetailRepository:PatientIdentifierInfoRepo
+     lateinit var patientDetailRepository:PatientIdentifierInfoRepo
 
     fun setPatientDetails(currentUser:FirebaseUser){
 

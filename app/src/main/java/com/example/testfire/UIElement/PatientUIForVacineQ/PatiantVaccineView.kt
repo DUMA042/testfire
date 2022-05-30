@@ -35,7 +35,7 @@ import com.google.firebase.ktx.Firebase
 fun PatientHomeScreenStatefull(auth: FirebaseAuth?,onSignOut:()->Unit,patientDetailViewModel: PatientDetailViewModel){
 
     auth?.currentUser?.let { patientDetailViewModel.setPatientDetails(it) }
-    val fill={}
+//nEED TO make Mutable
     if(patientDetailViewModel.isNewUser){
         var queuelist: MutableList<String> = mutableListOf("VAc", "Work", "Time")
         VaccineCenterDetails(queuelist,onSignOut,patientDetailViewModel)
@@ -99,7 +99,8 @@ fun userNeedInput(patientDetailViewModel: PatientDetailViewModel){
         )
 
         Button(onClick = {
-            patientDetailViewModel.fillPatientDetails(PatientPublicInfo(Nametext,Sextext,17))
+            val age=Agetext.toInt()
+            patientDetailViewModel.fillPatientDetails(PatientPublicInfo(Nametext,Sextext,age))
         }) {
 
 
