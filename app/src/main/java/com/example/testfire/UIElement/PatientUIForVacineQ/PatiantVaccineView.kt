@@ -22,12 +22,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.testfire.Enter
 import com.example.testfire.PatientDataClasses.PatientPublicInfo
 import com.example.testfire.ViewModels.PatientDetailViewModel
 import com.example.testfire.ui.theme.TestfireTheme
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
@@ -38,6 +36,8 @@ fun PatientHomeScreenStatefull(auth: FirebaseAuth?,onSignOut:()->Unit,patientDet
 //nEED TO make Mutable
     if(patientDetailViewModel.isNewUser){
         var queuelist: MutableList<String> = mutableListOf("VAc", "Work", "Time")
+        patientDetailViewModel.subscribeToRealtimeUpdatesIt()
+        patientDetailViewModel.setOpenHealthCentersListner()
         VaccineCenterDetails(queuelist,onSignOut,patientDetailViewModel)
     }
     else{
@@ -116,21 +116,21 @@ fun userNeedInput(patientDetailViewModel: PatientDetailViewModel){
 
 @Composable
 fun VaccineCenterDetails(queulist:MutableList<String>,onSignOut:()->Unit,patientDetailViewModel: PatientDetailViewModel){
+    var nn=patientDetailViewModel.listOfOpenHealthCenters
 Column() {
-   Text(text = "Name:")
+   Text(text = "Name: ${patientDetailViewModel.patientInfodetailsobject.name}")
    Spacer(modifier = Modifier.padding(top=7.dp))
-   Text(text = "Email:")
+   Text(text = "Email: ${patientDetailViewModel.patientInfodetailsobject.email}")
    Spacer(modifier = Modifier.padding(top=7.dp))
-   Text(text = "Location:")
-   Spacer(modifier = Modifier.padding(top=7.dp))
+
 
     LazyColumn {
         // Add a single item
 
 
         // Add 5 items
-        items(queulist.size) { index ->
-            Text(text = "Item: ${queulist[index]}")
+        items(patientDetailViewModel.listOfOpenHealthCenters.size) { index ->
+            Text(text = "Health Clinic: ${patientDetailViewModel.listOfOpenHealthCenters[index].Name} is open")
         }
 
 

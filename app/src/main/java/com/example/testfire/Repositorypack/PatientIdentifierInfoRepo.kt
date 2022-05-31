@@ -1,6 +1,7 @@
 package com.example.testfire.Repositorypack
 
 import android.content.ContentValues
+import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,11 +17,19 @@ import kotlinx.coroutines.withContext
 //Just for checking if the User has put in the right details
 class PatientIdentifierInfoRepo(currentUser:FirebaseUser) {
     val currentUserNow=currentUser
+    val linkToFireStore=Firebase.firestore
     var patientInfodetailsobject by mutableStateOf(PatientPublicInfo())
+    val patientInfoDocument=linkToFireStore.collection("Patient")
+        .document(currentUserNow.uid)
+
+    //For the Various  center collection
+    val openHealthCentersCollections=Firebase.firestore.collection("Health Centers")
+    //Need to add Data Class for the various vaccine centers
+
 
 
     suspend fun getPatientIdentifier() {
-        withContext(Dispatchers.IO) {
+
             val patientInfoDocument=Firebase.firestore.collection("Patient")
                 .document(currentUserNow.uid)
             Log.d(ContentValues.TAG, "User has not put in Datassssssss")
@@ -32,8 +41,9 @@ class PatientIdentifierInfoRepo(currentUser:FirebaseUser) {
            if(patientInfodetailsobject.name==""){
                Log.d(ContentValues.TAG, "User has not put in Data")
            }
-        }
+
     }
+
 
     fun checkForNewUser():Boolean{
         return patientInfodetailsobject.name!=""
@@ -41,8 +51,7 @@ class PatientIdentifierInfoRepo(currentUser:FirebaseUser) {
     /**This function should be check for for Permission fail later**/
 
     suspend fun fillInPatientDetails(patientPublicInfo: PatientPublicInfo){
-        val patientInfoDocument=Firebase.firestore.collection("Patient")
-            .document(currentUserNow.uid)
+
         val email=currentUserNow.email
         val(name,sex,age)=patientPublicInfo
 
@@ -58,5 +67,25 @@ class PatientIdentifierInfoRepo(currentUser:FirebaseUser) {
 
 
     }
+/**
+     fun subscribeToRealtimeUpdates() {
+
+        patientInfoDocument.addSnapshotListener { snapshot, e ->
+            if (e != null) {
+                Log.w(TAG, "Listen failed.", e)
+                return@addSnapshotListener
+            }
+
+            if (snapshot != null && snapshot.exists()) {
+                Log.d(TAG, "Current data: ${snapshot.data}")
+            } else {
+                Log.d(TAG, "Current data: null")
+            }
+        }
+
+    }**/
+
+
+
 
 }
