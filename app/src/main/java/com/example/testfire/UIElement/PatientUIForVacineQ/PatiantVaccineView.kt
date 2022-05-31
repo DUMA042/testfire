@@ -4,6 +4,7 @@ package com.example.testfire.UIElement.PatientUIForVacineQ
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -22,6 +23,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.testfire.PatientDataClasses.PatientPublicInfo
 import com.example.testfire.ViewModels.PatientDetailViewModel
 import com.example.testfire.ui.theme.TestfireTheme
@@ -115,8 +117,9 @@ fun userNeedInput(patientDetailViewModel: PatientDetailViewModel){
 }
 
 @Composable
-fun VaccineCenterDetails(queulist:MutableList<String>,onSignOut:()->Unit,patientDetailViewModel: PatientDetailViewModel){
+fun VaccineCenterDetails(queulist:MutableList<String>,onSignOut:()->Unit,patientDetailViewModel: PatientDetailViewModel = viewModel()){
     var nn=patientDetailViewModel.listOfOpenHealthCenters
+    var bn by  remember { mutableStateOf("") }
 Column() {
    Text(text = "Name: ${patientDetailViewModel.patientInfodetailsobject.name}")
    Spacer(modifier = Modifier.padding(top=7.dp))
@@ -126,12 +129,22 @@ Column() {
 
     LazyColumn {
         // Add a single item
+/**LazyColumn {
+items(messages) { message ->
+MessageRow(message)
+}
+}**/
 
+        items(patientDetailViewModel.listOfOpenHealthCenters,key={dddf->dddf.Name}){dddf->
+            forchecklazy(text =dddf.Name )
+        }
 
         // Add 5 items
+        /**
         items(patientDetailViewModel.listOfOpenHealthCenters.size) { index ->
             Text(text = "Health Clinic: ${patientDetailViewModel.listOfOpenHealthCenters[index].Name} is open")
-        }
+        }**/
+        //items(items = patientDetailViewModel.listOfOpenHealthCenter)
 
 
     }
@@ -164,6 +177,13 @@ Column() {
 
 
 
+}
+
+
+@Composable
+fun forchecklazy(text:String){
+    Spacer(modifier = Modifier.padding(top=7.dp))
+    Text(text = "The text is $text")
 }
 
 

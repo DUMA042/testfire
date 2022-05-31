@@ -18,7 +18,8 @@ class PatientDetailViewModel: ViewModel()  {
   var patientInfodetailsobject by mutableStateOf(PatientPublicInfo())
     //Need to change this to just HealthPublicInfo() object
   var openHealthCenters by mutableStateOf(HealthPublicInfo())
-  var listOfOpenHealthCenters = listOf(HealthPublicInfo()).toMutableStateList()
+  var listOfOpenHealthCenters = mutableListOf<HealthPublicInfo>().toMutableStateList()
+
 
     var isNewUser by mutableStateOf(true)
 
@@ -94,16 +95,20 @@ class PatientDetailViewModel: ViewModel()  {
                     return@addSnapshotListener
                 }
                 value?.let {
-                    listOfOpenHealthCenters=listOf(HealthPublicInfo()).toMutableStateList()
+
+                    var theListfortheCenters= mutableListOf<HealthPublicInfo>()
 
                     for (doc in it){
                         Log.d(TAG, "THe Health center is => ${doc.data}")
                         openHealthCenters=doc.toObject(HealthPublicInfo::class.java)!!
                         Log.d(TAG, "This is for open health object is => ${openHealthCenters}")
-                        listOfOpenHealthCenters.add(openHealthCenters)
+                        theListfortheCenters.add(openHealthCenters)
+
                     }
+                    listOfOpenHealthCenters=theListfortheCenters.toMutableStateList()
 
                 }
+
             }
 
 
