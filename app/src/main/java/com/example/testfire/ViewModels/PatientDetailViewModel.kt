@@ -97,15 +97,16 @@ class PatientDetailViewModel: ViewModel()  {
                 value?.let {
 
                     var theListfortheCenters= mutableListOf<HealthPublicInfo>()
-
+                    listOfOpenHealthCenters.clear()
                     for (doc in it){
                         Log.d(TAG, "THe Health center is => ${doc.data}")
                         openHealthCenters=doc.toObject(HealthPublicInfo::class.java)!!
                         Log.d(TAG, "This is for open health object is => ${openHealthCenters}")
-                        theListfortheCenters.add(openHealthCenters)
+                        //theListfortheCenters.add(openHealthCenters)
+                        listOfOpenHealthCenters.add(openHealthCenters)
 
                     }
-                    listOfOpenHealthCenters=theListfortheCenters.toMutableStateList()
+                    //listOfOpenHealthCenters=theListfortheCenters.toMutableStateList()
 
                 }
 

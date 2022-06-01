@@ -22,10 +22,10 @@ import com.example.testfire.ViewModels.PatientDetailViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun NavigationGraph(navController: NavHostController,auth: FirebaseAuth?,onSignOut:()->Unit,patientDetailViewModel: PatientDetailViewModel){
+fun NavigationGraph(navController: NavHostController,auth: FirebaseAuth?,onSignOut:()->Unit){
     NavHost(navController = navController, startDestination = NavScreens.HomeScreen.route){
         composable(route= NavScreens.HomeScreen.route){
-            HomeScreen(auth,onSignOut,patientDetailViewModel)
+            HomeScreen(auth,onSignOut)
         }
         composable(route = NavScreens.PatientDetailScreen.route){
             PatientDetailScreen()
@@ -39,12 +39,12 @@ fun NavigationGraph(navController: NavHostController,auth: FirebaseAuth?,onSignO
 
 
 @Composable
-fun MainScreen(auth: FirebaseAuth?,onSignOut:()->Unit,patientDetailViewModel: PatientDetailViewModel){
+fun MainScreen(auth: FirebaseAuth?,onSignOut:()->Unit){
     val navController = rememberNavController()
     Scaffold(
         bottomBar = { Bottombar(navController = navController) }
     ) {
-        NavigationGraph(navController = navController,auth,onSignOut,patientDetailViewModel)
+        NavigationGraph(navController = navController,auth,onSignOut)
     }
 
 }
@@ -77,8 +77,8 @@ fun RowScope.AddItem(screen: NavScreens, currentDestination: NavDestination?, na
 }
 
 @Composable
-fun HomeScreen(auth: FirebaseAuth?,onSignOut:()->Unit,patientDetailViewModel: PatientDetailViewModel){
-    PatientHomeScreenStatefull(auth,onSignOut,patientDetailViewModel)
+fun HomeScreen(auth: FirebaseAuth?,onSignOut:()->Unit){
+    PatientHomeScreenStatefull(auth,onSignOut)
 }
 
 

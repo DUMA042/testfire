@@ -42,6 +42,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -52,7 +53,7 @@ var signInStatus:Boolean=false
 class MainActivity : ComponentActivity() {
 
     private val authViewModel: AuthViewModel by viewModels()
-    private  val patientviewmodeldetails: PatientDetailViewModel by viewModels()
+    //private  val patientviewmodeldetails: PatientDetailViewModel by viewModels()
 
 
 
@@ -90,7 +91,7 @@ class MainActivity : ComponentActivity() {
                     var getloading by rememberSaveable{mutableStateOf(true)}
 
                     varifyLogInStaus()
-                    Greeting(auth,this,authViewModel,patientviewmodeldetails)
+                    Greeting(auth,this,authViewModel)
 
 
                     //CircularProgressAnimated()
@@ -214,7 +215,7 @@ fun Enter(){
 }
 
 @Composable
-fun Greeting(auth: FirebaseAuth?, context:ComponentActivity,authViewModel:AuthViewModel,patientviewmodeldetails:PatientDetailViewModel) {
+fun Greeting(auth: FirebaseAuth?, context:ComponentActivity,authViewModel:AuthViewModel,patientviewmodeldetails:PatientDetailViewModel= viewModel()) {
     val coroutineScope = rememberCoroutineScope()
     var userLogin by rememberSaveable{mutableStateOf(signInStatus)}
     val user by remember(authViewModel) { authViewModel.user }.collectAsState()
@@ -250,7 +251,7 @@ fun Greeting(auth: FirebaseAuth?, context:ComponentActivity,authViewModel:AuthVi
 
     ///////////////////////////////////////
     if(userLogin){
-      MainScreen(auth,onSignOut={userLogin=false},patientviewmodeldetails)
+      MainScreen(auth,onSignOut={userLogin=false})
     }
     else{
 
