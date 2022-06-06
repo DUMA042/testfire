@@ -42,6 +42,8 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import com.google.firebase.functions.FirebaseFunctions
+import com.google.firebase.functions.ktx.functions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -53,6 +55,7 @@ class MainActivity : ComponentActivity() {
 
     private val authViewModel: AuthViewModel by viewModels()
     private  val patientviewmodeldetails: PatientDetailViewModel by viewModels()
+    private lateinit var functions: FirebaseFunctions
 
 
 
@@ -63,7 +66,7 @@ class MainActivity : ComponentActivity() {
 
             auth = Firebase.auth
 
-
+        functions = Firebase.functions
 
         super.onCreate(savedInstanceState)
 
@@ -250,7 +253,8 @@ fun Greeting(auth: FirebaseAuth?, context:ComponentActivity,authViewModel:AuthVi
 
     ///////////////////////////////////////
     if(userLogin){
-      MainScreen(auth,onSignOut={userLogin=false},patientviewmodeldetails)
+        testcloudfunctions()
+      //MainScreen(auth,onSignOut={userLogin=false},patientviewmodeldetails)
     }
     else{
 
@@ -258,6 +262,11 @@ fun Greeting(auth: FirebaseAuth?, context:ComponentActivity,authViewModel:AuthVi
     }
 
 
+
+}
+/**This is for testing cloud function will be removed later*/
+@Composable
+fun testcloudfunctions(){
 
 }
 

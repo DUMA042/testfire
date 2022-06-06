@@ -7,7 +7,7 @@ import com.firebase.ui.auth.AuthMethodPickerLayout
 import com.firebase.ui.auth.AuthUI
 import kotlinx.coroutines.flow.MutableStateFlow
 
-class ProfileViewmodel  {
+class functionViewmodel  {
 
 
 }
