@@ -1,13 +1,55 @@
 package com.example.testfire
 
-import android.content.Intent
-import android.view.View
-import androidx.lifecycle.ViewModel
-import com.firebase.ui.auth.AuthMethodPickerLayout
-import com.firebase.ui.auth.AuthUI
-import kotlinx.coroutines.flow.MutableStateFlow
 
-class functionViewmodel  {
+import androidx.lifecycle.ViewModel
+import com.google.android.gms.tasks.Task
+
+import com.google.firebase.functions.FirebaseFunctions
+import com.google.firebase.functions.FirebaseFunctionsException
+import com.google.firebase.functions.ktx.functions
+import com.google.firebase.ktx.Firebase
+
+
+class functionViewmodel:ViewModel() {
+    private var functions: FirebaseFunctions = Firebase.functions
+
+
+    private fun addMessage(text: String): Task<String> {
+        // Create the arguments to the callable function.
+        val data = hashMapOf(
+            "text" to text,
+            "push" to true
+        )
+
+        return functions
+            .getHttpsCallable("addMessage")
+            .call(data)
+            .continueWith { task ->
+                // This continuation runs on either success or failure, but if the task
+                // has failed then result will throw an Exception which will be
+                // propagated down.
+                val result = task.result?.data as String
+                result
+            }
+
+    }
+    //////////////////
+
+    private fun callAddMessage(inputMessage: String){
+        // [START call_add_message]
+        addMessage(inputMessage)
+            .addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    val e = task.exception
+                    if (e is FirebaseFunctionsException) {
+                        val code = e.code
+                        val details = e.details
+                    }
+                }
+            }
+        // [END call_add_message]
+    }
+
 
 
 }
