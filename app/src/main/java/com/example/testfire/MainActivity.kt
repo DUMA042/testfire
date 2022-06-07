@@ -253,8 +253,8 @@ fun Greeting(auth: FirebaseAuth?, context:ComponentActivity,authViewModel:AuthVi
 
     ///////////////////////////////////////
     if(userLogin){
-        testcloudfunctions()
-      //MainScreen(auth,onSignOut={userLogin=false},patientviewmodeldetails)
+        //testcloudfunctions()
+      MainScreen(auth,onSignOut={userLogin=false},patientviewmodeldetails)
     }
     else{
 

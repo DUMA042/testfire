@@ -36,6 +36,7 @@ fun PatientHomeScreenStatefull(auth: FirebaseAuth?,onSignOut:()->Unit,patientDet
 
     auth?.currentUser?.let { patientDetailViewModel.setPatientDetails(it) }
 //nEED TO make Mutable
+
     if(patientDetailViewModel.isNewUser){
         var queuelist: MutableList<String> = mutableListOf("VAc", "Work", "Time")
         patientDetailViewModel.subscribeToRealtimeUpdatesIt()
