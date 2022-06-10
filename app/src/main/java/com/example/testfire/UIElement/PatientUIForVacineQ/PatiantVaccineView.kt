@@ -1,9 +1,10 @@
-@file:OptIn(ExperimentalComposeUiApi::class)
+@file:OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
 
 package com.example.testfire.UIElement.PatientUIForVacineQ
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -24,16 +25,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.testfire.HealthCenterClasses.HealthPublicInfo
+import com.example.testfire.NavComponent.NavTypes.NavScreens
 import com.example.testfire.PatientDataClasses.PatientPublicInfo
 import com.example.testfire.ViewModels.PatientDetailViewModel
 import com.example.testfire.functionViewmodel
-import com.example.testfire.ui.theme.TestfireTheme
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
 
 @Composable
-fun PatientHomeScreenStatefull(auth: FirebaseAuth?,onSignOut:()->Unit,patientDetailViewModel: PatientDetailViewModel= viewModel()){
+fun PatientHomeScreenStatefull(auth: FirebaseAuth?, onSignOut:()->Unit, navController: NavController, patientDetailViewModel: PatientDetailViewModel= viewModel()){
 
     auth?.currentUser?.let { patientDetailViewModel.setPatientDetails(it) }
 //nEED TO make Mutable
@@ -41,7 +43,7 @@ fun PatientHomeScreenStatefull(auth: FirebaseAuth?,onSignOut:()->Unit,patientDet
         var queuelist: MutableList<String> = mutableListOf("VAc", "Work", "Time")
         patientDetailViewModel.subscribeToRealtimeUpdatesIt()
         patientDetailViewModel.setOpenHealthCentersListner()
-        VaccineCenterDetails(queuelist,onSignOut)
+        VaccineCenterDetails(queuelist,onSignOut,navController)
     }
     else{
         userNeedInput()
@@ -70,7 +72,6 @@ fun userNeedInput(patientDetailViewModel: PatientDetailViewModel= viewModel()){
             placeholder={ Text("Your Name") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text,imeAction = ImeAction.Next),
             keyboardActions = KeyboardActions(onNext = {focusSex.requestFocus()})
-
         )
 
         OutlinedTextField(
@@ -118,17 +119,18 @@ fun userNeedInput(patientDetailViewModel: PatientDetailViewModel= viewModel()){
 }
 
 @Composable
-fun VaccineCenterDetails(queulist:MutableList<String>,onSignOut:()->Unit,patientDetailViewModel: PatientDetailViewModel = viewModel(),ff: functionViewmodel= viewModel()){
+fun VaccineCenterDetails(queulist:MutableList<String>,onSignOut:()->Unit,navController: NavController,patientDetailViewModel: PatientDetailViewModel = viewModel(),ff: functionViewmodel= viewModel()){
     var nn=patientDetailViewModel.listOfOpenHealthCenters
+    //var moveTonewScreen={/*navController.navigate(NavScreens.QueueScreen.route)*/ }
    // var bn by  remember { mutableStateOf(patientDetailViewModel.listOfOpenHealthCenters) }
 Column() {
-   Text(text = "Name: ${patientDetailViewModel.patientInfodetailsobject.name}")
+   Text(text = "Name: ${patientDetailViewModel.patientInfodetailsobject.latitude}")
    Spacer(modifier = Modifier.padding(top=7.dp))
    Text(text = "Email: ${patientDetailViewModel.patientInfodetailsobject.email}")
    Spacer(modifier = Modifier.padding(top=7.dp))
 
 
-    LazyColumn {
+    LazyColumn{
         // Add a single item
 /**LazyColumn {
 items(messages) { message ->
@@ -136,8 +138,8 @@ MessageRow(message)
 }
 }**/
 
-        items(patientDetailViewModel.listOfOpenHealthCenters,key={dddf->dddf.Name}){dddf->
-            forchecklazy(text =dddf.Name+dddf.healthCenterUID)
+        items(patientDetailViewModel.listOfOpenHealthCenters){HealthCenter->
+            displayEachHealthCenterDetails(navController,HealthCenter)
         }
 
         // Add 5 items
@@ -150,7 +152,9 @@ MessageRow(message)
 
     }
 
-   Row() {
+
+
+  /** Row() {
        Card(
            elevation = 7.dp, modifier = Modifier
                .width(68.dp)
@@ -158,7 +162,7 @@ MessageRow(message)
            ){
            Text(text ="Work", modifier = Modifier.fillMaxWidth() )
        }
-   }
+   }**/
 
     Button(onClick = {
        // Firebase.auth.signOut()
@@ -183,9 +187,34 @@ MessageRow(message)
 
 
 @Composable
-fun forchecklazy(text:String){
-    Spacer(modifier = Modifier.padding(top=7.dp))
-    Text(text = "The text is $text")
+fun displayEachHealthCenterDetails(navController: NavController,healthcenterinfo:HealthPublicInfo=HealthPublicInfo(),patientDetailViewModel: PatientDetailViewModel = viewModel()){
+var  listofQueues=healthcenterinfo.QueueList
+val currentCenter by remember { mutableStateOf(healthcenterinfo) }
+    Card( elevation = 7.dp, modifier = Modifier
+        .fillMaxWidth()
+        .padding(2.dp), shape = RoundedCornerShape(8.dp),onClick = {navController.currentBackStackEntry?.savedStateHandle?.set("HealthCenter",currentCenter)
+        navController.navigate(NavScreens.QueueScreen.route) }) {
+        Column() {
+            Text(text = "Name: "+healthcenterinfo.Name)
+            Text(text = "Location: "+healthcenterinfo.LocationName)
+      LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp),contentPadding = PaddingValues(horizontal = 6.dp)){
+          items(listofQueues) { item ->
+              queueInHealthCenter(item)
+          }
+      }
+
+        }
+    }
+
+}
+
+@Composable
+fun queueInHealthCenter(Queue:String){
+    Card(
+        shape = RoundedCornerShape(8.dp)
+    ){
+        Text(text =Queue, modifier = Modifier.padding(2.dp) )
+    }
 }
 
 
@@ -193,7 +222,11 @@ fun forchecklazy(text:String){
 @Preview(showBackground = true)
 @Composable
 fun VaccineCenterDetailSingleUiView() {
-    TestfireTheme {
-        //VaccineCenterDetails()
+    Row() {
+        Card(
+            shape = RoundedCornerShape(8.dp)
+        ){
+            Text(text ="Work", modifier = Modifier.padding(2.dp) )
+        }
     }
 }

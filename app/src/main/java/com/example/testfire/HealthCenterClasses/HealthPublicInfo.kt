@@ -1,5 +1,9 @@
 package com.example.testfire.HealthCenterClasses
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class HealthPublicInfo(val Name:String="",
                             val Email:String="",
                             val LocationName:String="",
@@ -9,5 +13,6 @@ data class HealthPublicInfo(val Name:String="",
                             val recommend:Boolean=false,
                             val longitude:String="0.0",
                             val latitude:String="0.0",
-                            var healthCenterUID:String="",var DistanceRelative:Double=0.0)
+                            var healthCenterUID:String="",var DistanceRelative:Float=0f) :
+    Parcelable
 

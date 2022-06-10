@@ -21,6 +21,8 @@ class PatientDetailViewModel: ViewModel()  {
   var patientInfodetailsobject by mutableStateOf(PatientPublicInfo())
     //Need to change this to just HealthPublicInfo() object
   var openHealthCenters by mutableStateOf(HealthPublicInfo())
+  var currentViewHealthCenters by mutableStateOf(HealthPublicInfo())
+
   var listOfOpenHealthCenters = mutableListOf<HealthPublicInfo>().toMutableStateList()
 
 
@@ -28,6 +30,12 @@ class PatientDetailViewModel: ViewModel()  {
 
 
     lateinit var patientDetailRepository:PatientIdentifierInfoRepo
+
+    fun setTheCurrentViewHealthCenter(healthPublicInfo: HealthPublicInfo){
+        currentViewHealthCenters=healthPublicInfo
+        Log.d(ContentValues.TAG, "Entered the set health ${currentViewHealthCenters}")
+
+    }
 
     fun setPatientDetails(currentUser:FirebaseUser){
 
@@ -87,14 +95,6 @@ class PatientDetailViewModel: ViewModel()  {
 
     }
 
-fun calculatedistance(){
-
-    val distance = FloatArray(2)
-    val distance1 = FloatArray(2)
-    Location.distanceBetween(37.131971, -95.704066, 37.086795, -95.697882,distance);
-    Location.distanceBetween(37.131971, -95.704066, 37.133066, -95.688949,distance1);
-
-}
 
     fun setOpenHealthCentersListner(){
 
@@ -113,17 +113,25 @@ fun calculatedistance(){
                         Log.d(TAG, "THE Health center ID => ${doc.id}")
 
                         val distance = FloatArray(2)
-                        val distance1 = FloatArray(2)
-                        Location.distanceBetween(37.131971, -95.704066, 37.086795, -95.697882,distance);
-                        Location.distanceBetween(37.131971, -95.704066, 37.133066, -95.688949,distance1);
-                        Log.d(TAG, "THE DISTANCE IS ==========> ${distance[0]}   ${distance1[0]}")
+
+
+                        Log.d(TAG, "THE DISTANCE IS ==========> ${distance[0]} ")
+
                         openHealthCenters=doc.toObject(HealthPublicInfo::class.java)!!
                         openHealthCenters.healthCenterUID=doc.id
+
+                        Location.distanceBetween((patientDetailRepository.patientInfodetailsobject.latitude).toDouble(),
+                            (patientDetailRepository.patientInfodetailsobject.longitude).toDouble(), openHealthCenters.latitude.toDouble(),
+                            openHealthCenters.longitude.toDouble(),
+                            distance)
+                        openHealthCenters.DistanceRelative=distance[0]
+
                         Log.d(TAG, "This is for open health object is => ${openHealthCenters}")
                         theListfortheCenters.add(openHealthCenters)
 
 
                     }
+                    theListfortheCenters.sortWith(compareBy { it.DistanceRelative })
                     listOfOpenHealthCenters=theListfortheCenters.toMutableStateList()
 
                 }
