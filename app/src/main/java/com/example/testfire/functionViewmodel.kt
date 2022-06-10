@@ -35,7 +35,7 @@ class functionViewmodel:ViewModel() {
     }
     //////////////////
 
-    private fun callAddMessage(inputMessage: String){
+     fun callAddMessage(inputMessage: String){
         // [START call_add_message]
         addMessage(inputMessage)
             .addOnCompleteListener { task ->

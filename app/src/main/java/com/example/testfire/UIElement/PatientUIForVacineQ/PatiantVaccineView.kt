@@ -26,13 +26,14 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.testfire.PatientDataClasses.PatientPublicInfo
 import com.example.testfire.ViewModels.PatientDetailViewModel
+import com.example.testfire.functionViewmodel
 import com.example.testfire.ui.theme.TestfireTheme
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
 @Composable
-fun PatientHomeScreenStatefull(auth: FirebaseAuth?,onSignOut:()->Unit,patientDetailViewModel: PatientDetailViewModel){
+fun PatientHomeScreenStatefull(auth: FirebaseAuth?,onSignOut:()->Unit,patientDetailViewModel: PatientDetailViewModel= viewModel()){
 
     auth?.currentUser?.let { patientDetailViewModel.setPatientDetails(it) }
 //nEED TO make Mutable
@@ -40,16 +41,16 @@ fun PatientHomeScreenStatefull(auth: FirebaseAuth?,onSignOut:()->Unit,patientDet
         var queuelist: MutableList<String> = mutableListOf("VAc", "Work", "Time")
         patientDetailViewModel.subscribeToRealtimeUpdatesIt()
         patientDetailViewModel.setOpenHealthCentersListner()
-        VaccineCenterDetails(queuelist,onSignOut,patientDetailViewModel)
+        VaccineCenterDetails(queuelist,onSignOut)
     }
     else{
-        userNeedInput(patientDetailViewModel)
+        userNeedInput()
     }
 
 }
 
 @Composable
-fun userNeedInput(patientDetailViewModel: PatientDetailViewModel){
+fun userNeedInput(patientDetailViewModel: PatientDetailViewModel= viewModel()){
     var Nametext by remember { mutableStateOf("") }
     var Sextext by remember { mutableStateOf("") }
     var Agetext by remember { mutableStateOf("") }
@@ -117,9 +118,9 @@ fun userNeedInput(patientDetailViewModel: PatientDetailViewModel){
 }
 
 @Composable
-fun VaccineCenterDetails(queulist:MutableList<String>,onSignOut:()->Unit,patientDetailViewModel: PatientDetailViewModel = viewModel()){
+fun VaccineCenterDetails(queulist:MutableList<String>,onSignOut:()->Unit,patientDetailViewModel: PatientDetailViewModel = viewModel(),ff: functionViewmodel= viewModel()){
     var nn=patientDetailViewModel.listOfOpenHealthCenters
-    var bn by  remember { mutableStateOf("") }
+   // var bn by  remember { mutableStateOf(patientDetailViewModel.listOfOpenHealthCenters) }
 Column() {
    Text(text = "Name: ${patientDetailViewModel.patientInfodetailsobject.name}")
    Spacer(modifier = Modifier.padding(top=7.dp))
@@ -136,7 +137,7 @@ MessageRow(message)
 }**/
 
         items(patientDetailViewModel.listOfOpenHealthCenters,key={dddf->dddf.Name}){dddf->
-            forchecklazy(text =dddf.Name )
+            forchecklazy(text =dddf.Name+dddf.healthCenterUID)
         }
 
         // Add 5 items
@@ -160,8 +161,9 @@ MessageRow(message)
    }
 
     Button(onClick = {
-        Firebase.auth.signOut()
-        onSignOut()
+       // Firebase.auth.signOut()
+       // onSignOut()
+        ff.callAddMessage("Working good")
        }) {
         /**This is for the Sign out button*/
 

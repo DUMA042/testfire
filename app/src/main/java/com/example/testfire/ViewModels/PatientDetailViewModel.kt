@@ -2,9 +2,12 @@ package com.example.testfire.ViewModels
 
 import android.content.ContentValues
 import android.content.ContentValues.TAG
+import android.location.Location
 import android.util.Log
-import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.testfire.HealthCenterClasses.HealthPublicInfo
@@ -24,7 +27,7 @@ class PatientDetailViewModel: ViewModel()  {
     var isNewUser by mutableStateOf(true)
 
 
-     lateinit var patientDetailRepository:PatientIdentifierInfoRepo
+    lateinit var patientDetailRepository:PatientIdentifierInfoRepo
 
     fun setPatientDetails(currentUser:FirebaseUser){
 
@@ -84,12 +87,19 @@ class PatientDetailViewModel: ViewModel()  {
 
     }
 
+fun calculatedistance(){
 
+    val distance = FloatArray(2)
+    val distance1 = FloatArray(2)
+    Location.distanceBetween(37.131971, -95.704066, 37.086795, -95.697882,distance);
+    Location.distanceBetween(37.131971, -95.704066, 37.133066, -95.688949,distance1);
+
+}
 
     fun setOpenHealthCentersListner(){
 
         patientDetailRepository.openHealthCentersCollections
-            .whereEqualTo("open",true)
+            .whereEqualTo("open",true).whereEqualTo("recommend",true)
             .addSnapshotListener { value, e ->
                 e?.let {
                     return@addSnapshotListener
@@ -99,10 +109,19 @@ class PatientDetailViewModel: ViewModel()  {
                     var theListfortheCenters= mutableListOf<HealthPublicInfo>()
 
                     for (doc in it){
-                        Log.d(TAG, "THe Health center is => ${doc.data}")
+                        Log.d(TAG, "THE Health center is => ${doc.data}")
+                        Log.d(TAG, "THE Health center ID => ${doc.id}")
+
+                        val distance = FloatArray(2)
+                        val distance1 = FloatArray(2)
+                        Location.distanceBetween(37.131971, -95.704066, 37.086795, -95.697882,distance);
+                        Location.distanceBetween(37.131971, -95.704066, 37.133066, -95.688949,distance1);
+                        Log.d(TAG, "THE DISTANCE IS ==========> ${distance[0]}   ${distance1[0]}")
                         openHealthCenters=doc.toObject(HealthPublicInfo::class.java)!!
+                        openHealthCenters.healthCenterUID=doc.id
                         Log.d(TAG, "This is for open health object is => ${openHealthCenters}")
                         theListfortheCenters.add(openHealthCenters)
+
 
                     }
                     listOfOpenHealthCenters=theListfortheCenters.toMutableStateList()
