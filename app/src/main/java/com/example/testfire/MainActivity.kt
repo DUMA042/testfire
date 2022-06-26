@@ -43,6 +43,7 @@ import com.google.firebase.ktx.Firebase
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.testfire.ViewModels.HealthCenterIndividualQueuesViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -55,6 +56,8 @@ class MainActivity : ComponentActivity() {
     private val authViewModel: AuthViewModel by viewModels()
     private  val patientviewmodeldetails: PatientDetailViewModel by viewModels()
     private val fuctionviewmodels:functionViewmodel by viewModels()
+    private val individualhealthcenter : HealthCenterIndividualQueuesViewModel by viewModels()
+
 
 
     private lateinit var auth: FirebaseAuth
@@ -91,7 +94,7 @@ class MainActivity : ComponentActivity() {
                     var getloading by rememberSaveable{mutableStateOf(true)}
 
                     varifyLogInStaus()
-                    Greeting(auth,this,authViewModel,patientviewmodeldetails)
+                    Greeting(auth,this,authViewModel)
 
 
                     //CircularProgressAnimated()

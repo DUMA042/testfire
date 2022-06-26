@@ -16,7 +16,7 @@ import com.example.testfire.Repositorypack.PatientIdentifierInfoRepo
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
 
-class PatientDetailViewModel: ViewModel()  {
+ class PatientDetailViewModel: ViewModel()  {
 
   var patientInfodetailsobject by mutableStateOf(PatientPublicInfo())
     //Need to change this to just HealthPublicInfo() object
@@ -28,8 +28,9 @@ class PatientDetailViewModel: ViewModel()  {
 
     var isNewUser by mutableStateOf(true)
 
+     lateinit var usertoken:FirebaseUser
 
-    lateinit var patientDetailRepository:PatientIdentifierInfoRepo
+  var patientDetailRepository:PatientIdentifierInfoRepo= PatientIdentifierInfoRepo(null)
 
     fun setTheCurrentViewHealthCenter(healthPublicInfo: HealthPublicInfo){
         currentViewHealthCenters=healthPublicInfo
@@ -57,8 +58,11 @@ class PatientDetailViewModel: ViewModel()  {
             patientDetailRepository= PatientIdentifierInfoRepo(currentUser)
             patientDetailRepository.getPatientIdentifier()
            isNewUser=patientDetailRepository.checkForNewUser()
+           usertoken=currentUser
 
         }
+
+
 
 
 
@@ -78,20 +82,20 @@ class PatientDetailViewModel: ViewModel()  {
 
 
     fun subscribeToRealtimeUpdatesIt() {
-          patientDetailRepository.patientInfoDocument.addSnapshotListener { snapshot, e ->
-              e?.let {
-                  Log.w(ContentValues.TAG, "Listen failed.", e)
-                  return@addSnapshotListener
-              }
+        patientDetailRepository.patientInfoDocument?.addSnapshotListener { snapshot, e ->
+            e?.let {
+                Log.w(ContentValues.TAG, "Listen failed.", e)
+                return@addSnapshotListener
+            }
 
-             snapshot?.let {
-                 Log.d(ContentValues.TAG, "Current data: ${it.data}")
+            snapshot?.let {
+                Log.d(ContentValues.TAG, "Current data: ${it.data}")
 
-                 patientInfodetailsobject= it.toObject(PatientPublicInfo::class.java)!!
-                 Log.d(ContentValues.TAG, "This is for the object: $patientInfodetailsobject")
-             }
+                patientInfodetailsobject= it.toObject(PatientPublicInfo::class.java)!!
+                Log.d(ContentValues.TAG, "This is for the object: $patientInfodetailsobject")
+            }
 
-          }
+        }
 
     }
 
@@ -160,6 +164,9 @@ class PatientDetailViewModel: ViewModel()  {
 
     }
 
+fun getUSer():FirebaseUser{
+    return usertoken
+}
 
     fun getHealthCenters(){
 

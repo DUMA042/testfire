@@ -20,6 +20,7 @@ import com.example.testfire.HealthCenterClasses.HealthPublicInfo
 import com.example.testfire.NavComponent.NavTypes.NavScreens
 import com.example.testfire.UIElement.PatientUIForVacineQ.PatientHomeScreenStatefull
 import com.example.testfire.UIElement.PatientUIForVacineQ.currentHealthCenterDetail
+import com.example.testfire.UseCases.IndividualHealthCenterContainer
 import com.example.testfire.ViewModels.PatientDetailViewModel
 import com.google.firebase.auth.FirebaseAuth
 
@@ -35,7 +36,7 @@ fun NavigationGraph(navController: NavHostController,auth: FirebaseAuth?,onSignO
             PatientDetailScreen()
         }
         composable(route = NavScreens.QueueScreen.route){
-            val result=navController.previousBackStackEntry?.savedStateHandle?.get<HealthPublicInfo?>("HealthCenter")
+            val result=navController.previousBackStackEntry?.savedStateHandle?.get<IndividualHealthCenterContainer?>("HealthCenter")
             currentHealthCenterScreen(auth,result)
         }
     }
@@ -89,7 +90,7 @@ fun HomeScreen(auth: FirebaseAuth?,onSignOut:()->Unit,navController: NavControll
 
 
 @Composable
-fun currentHealthCenterScreen(auth: FirebaseAuth?,result:HealthPublicInfo?){
+fun currentHealthCenterScreen(auth: FirebaseAuth?,result:IndividualHealthCenterContainer?){
     //var HealthCenterState=patientDetailViewModel.currentViewHealthCenters
     currentHealthCenterDetail(auth,result)
 

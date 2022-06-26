@@ -15,12 +15,14 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
 //Just for checking if the User has put in the right details
-class PatientIdentifierInfoRepo(currentUser:FirebaseUser) {
+class PatientIdentifierInfoRepo(currentUser: FirebaseUser?) {
     val currentUserNow=currentUser
     val linkToFireStore=Firebase.firestore
     var patientInfodetailsobject by mutableStateOf(PatientPublicInfo())
-    val patientInfoDocument=linkToFireStore.collection("Patient")
-        .document(currentUserNow.uid)
+    val patientInfoDocument= currentUserNow?.let {
+        linkToFireStore.collection("Patient")
+        .document(it.uid)
+    }
 
     //For the Various  center collection
     val openHealthCentersCollections=Firebase.firestore.collection("Health Centers")
@@ -30,10 +32,12 @@ class PatientIdentifierInfoRepo(currentUser:FirebaseUser) {
 
     suspend fun getPatientIdentifier() {
 
-            val patientInfoDocument=Firebase.firestore.collection("Patient")
-                .document(currentUserNow.uid)
+            val patientInfoDocument= currentUserNow?.let {
+                Firebase.firestore.collection("Patient")
+                    .document(it.uid)
+            }
             Log.d(ContentValues.TAG, "User has not put in Datassssssss")
-          var patientDoc=  patientInfoDocument.get().await().toObject(PatientPublicInfo::class.java)
+          var patientDoc= patientInfoDocument?.get()?.await()?.toObject(PatientPublicInfo::class.java)
             patientDoc.let { if(it!=null)
                 patientInfodetailsobject=it
                 Log.d(ContentValues.TAG, "The data is ${patientInfodetailsobject}")
@@ -52,13 +56,13 @@ class PatientIdentifierInfoRepo(currentUser:FirebaseUser) {
 
     suspend fun fillInPatientDetails(patientPublicInfo: PatientPublicInfo){
 
-        val email=currentUserNow.email
+        val email= currentUserNow?.email
         val(name,sex,age)=patientPublicInfo
 
         //Just in case the email is null
         val patientNewInfo= email?.let { PatientPublicInfo(name,sex,age, it) }
         withContext(Dispatchers.IO){
-            patientNewInfo?.let { patientInfoDocument.set(it).await() }
+            patientNewInfo?.let { patientInfoDocument?.set(it)?.await() ?: null }
             if (patientNewInfo != null) {
                 patientInfodetailsobject=patientNewInfo
             }

@@ -18,7 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,13 +28,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.testfire.HealthCenterClasses.HealthPublicInfo
 import com.example.testfire.NavComponent.NavTypes.NavScreens
 import com.example.testfire.PatientDataClasses.PatientPublicInfo
+import com.example.testfire.R
 import com.example.testfire.ViewModels.PatientDetailViewModel
 import com.example.testfire.functionViewmodel
+import com.example.testfire.ui.theme.PatientTopDetailSurfaceColor
 import com.google.firebase.auth.FirebaseAuth
+import androidx.compose.foundation.Image
+import com.example.testfire.UseCases.IndividualHealthCenterContainer
+import com.example.testfire.ui.theme.HealthCenterSurfaceColor
 
 @Composable
 fun PatientHomeScreenStatefull(auth: FirebaseAuth?, onSignOut:()->Unit, navController: NavController, patientDetailViewModel: PatientDetailViewModel= viewModel()){
@@ -40,7 +46,7 @@ fun PatientHomeScreenStatefull(auth: FirebaseAuth?, onSignOut:()->Unit, navContr
     auth?.currentUser?.let { patientDetailViewModel.setPatientDetails(it) }
 //nEED TO make Mutable
     if(patientDetailViewModel.isNewUser){
-        var queuelist: MutableList<String> = mutableListOf("VAc", "Work", "Time")
+        var queuelist: MutableList<String> = mutableListOf("")
         patientDetailViewModel.subscribeToRealtimeUpdatesIt()
         patientDetailViewModel.setOpenHealthCentersListner()
         VaccineCenterDetails(queuelist,onSignOut,navController)
@@ -123,11 +129,41 @@ fun VaccineCenterDetails(queulist:MutableList<String>,onSignOut:()->Unit,navCont
     var nn=patientDetailViewModel.listOfOpenHealthCenters
     //var moveTonewScreen={/*navController.navigate(NavScreens.QueueScreen.route)*/ }
    // var bn by  remember { mutableStateOf(patientDetailViewModel.listOfOpenHealthCenters) }
-Column() {
-   Text(text = "Name: ${patientDetailViewModel.patientInfodetailsobject.latitude}")
-   Spacer(modifier = Modifier.padding(top=7.dp))
-   Text(text = "Email: ${patientDetailViewModel.patientInfodetailsobject.email}")
-   Spacer(modifier = Modifier.padding(top=7.dp))
+Column( modifier = Modifier.fillMaxSize(),
+    horizontalAlignment = Alignment.CenterHorizontally)
+
+{
+
+    Surface(shape = RoundedCornerShape(topStart = 15.dp, bottomEnd = 15.dp),
+        color = PatientTopDetailSurfaceColor,
+        elevation=10.dp,
+        modifier= Modifier.height(100.dp)
+            .padding(10.dp))
+    {
+        Column(modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally)
+        {
+
+            Text(text = "Name: ${patientDetailViewModel.patientInfodetailsobject.name}")
+            Spacer(modifier = Modifier.padding(top=7.dp))
+            Text(text = "Email: ${patientDetailViewModel.patientInfodetailsobject.email}")
+            Spacer(modifier = Modifier.padding(top=7.dp))
+        }
+
+
+
+
+    }
+
+    Text(text="OPEN HEALTH CENTERS")
+    Divider(
+        color = Color.DarkGray,
+        modifier = Modifier
+            .fillMaxWidth(),
+        thickness = 1.dp
+    )
+
 
 
     LazyColumn{
@@ -173,7 +209,7 @@ MessageRow(message)
 
         /**This is for the Sign out button*/
 
-        Text(text = "Sign Out")
+        Text(text = "Sign Out-")
     }
 
     Divider(color = Color.Black, modifier = Modifier
@@ -190,30 +226,55 @@ MessageRow(message)
 fun displayEachHealthCenterDetails(navController: NavController,healthcenterinfo:HealthPublicInfo=HealthPublicInfo(),patientDetailViewModel: PatientDetailViewModel = viewModel()){
 var  listofQueues=healthcenterinfo.QueueList
 val currentCenter by remember { mutableStateOf(healthcenterinfo) }
-    Card( elevation = 7.dp, modifier = Modifier
+val passingContainer =IndividualHealthCenterContainer(patientDetailViewModel.getUSer(),currentCenter)
+    Surface( elevation = 7.dp, modifier = Modifier
         .fillMaxWidth()
-        .padding(2.dp), shape = RoundedCornerShape(8.dp),onClick = {navController.currentBackStackEntry?.savedStateHandle?.set("HealthCenter",currentCenter)
+        .padding(start = 4.dp,top=7.dp,end=4.dp), color = HealthCenterSurfaceColor, shape = MaterialTheme.shapes.small,onClick = {navController.currentBackStackEntry?.savedStateHandle?.set("HealthCenter",passingContainer)
         navController.navigate(NavScreens.QueueScreen.route) }) {
-        Column() {
-            Text(text = "Name: "+healthcenterinfo.Name)
-            Text(text = "Location: "+healthcenterinfo.LocationName)
-      LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp),contentPadding = PaddingValues(horizontal = 6.dp)){
-          items(listofQueues) { item ->
-              queueInHealthCenter(item)
-          }
-      }
 
+
+        Row(modifier = Modifier.fillMaxSize()) {
+            Image(
+                painter = painterResource(R.drawable.ic_launcher_background),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.width(80.dp)
+            )
+
+            Column(modifier = Modifier.fillMaxSize()) {
+                Text(text = "Name: " + healthcenterinfo.Name)
+                Text(text = "Location: " + healthcenterinfo.LocationName)
+
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomEnd) {
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        contentPadding = PaddingValues(horizontal = 6.dp)
+                    ) {
+                        items(listofQueues) { item ->
+
+                            queueInHealthCenter(item)
+                        }
+                    }
+                }
+
+
+            }
         }
+
+
     }
 
 }
 
 @Composable
 fun queueInHealthCenter(Queue:String){
-    Card(
-        shape = RoundedCornerShape(8.dp)
-    ){
-        Text(text =Queue, modifier = Modifier.padding(2.dp) )
+    Box(modifier=Modifier.fillMaxSize()) {
+        Card(
+            modifier=Modifier.align(Alignment.BottomCenter),
+            shape = RoundedCornerShape(8.dp)
+        ) {
+            Text(text = Queue, modifier = Modifier.padding(2.dp))
+        }
     }
 }
 
