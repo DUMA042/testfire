@@ -33,30 +33,94 @@ import com.google.firebase.ktx.Firebase
 @Composable
 fun PatientHomeScreenStatefull(auth: FirebaseAuth?,onSignOut:()->Unit,simdemo:demoView= viewModel()){
     var controlsim =simdemo.simfor
+    var controlincrease=simdemo.simincrease
     var Nametext by remember { mutableStateOf("") }
     var Capacitytext by remember { mutableStateOf("") }
     var Descriptiontext by remember { mutableStateOf("") }
     val keyboardController =  LocalSoftwareKeyboardController.current
     val (focusCapacity,focusDescription) = remember { FocusRequester.createRefs()}
     var queuelist: MutableList<String> = mutableListOf("VAc", "Work", "Time")
-    var creatingqueue by remember{mutableStateOf(1)}
-
+    var creatingqueue by remember{mutableStateOf(-1)}
+    var numbertime by  remember{mutableStateOf(0)}
     
     Column(modifier = Modifier.fillMaxSize(),verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+if(creatingqueue==-1){
+    OutlinedTextField(
+        value = Nametext,
+        modifier = Modifier
+            .padding(top = 7.dp)
+            .align(Alignment.CenterHorizontally),
+        onValueChange = { Nametext = it },
+        label = { Text("NAME:",fontSize=20.sp) },
+        placeholder={ Text("Your Health Center NAme") },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text,imeAction = ImeAction.Next),
+        keyboardActions = KeyboardActions(onNext = {focusDescription.requestFocus()})
+    )
 
-        Card() {
+    OutlinedTextField(
+        value = Descriptiontext,
+        modifier = Modifier
+            .padding(top = 7.dp)
+            .align(Alignment.CenterHorizontally)
+            .focusRequester(focusDescription),
+        onValueChange = { Descriptiontext = it },
+        label = { Text("Your Location:",fontSize=20.sp) },
+        placeholder={ Text("Summary of the Queue Purpose") },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number,imeAction = ImeAction.Done),
+        keyboardActions = KeyboardActions (onDone = {keyboardController?.hide()})
+
+    )
+
+    Button(
+        onClick = {
+            simdemo.simfor=0
+            simdemo.simcreatingqueue(1,10000L)
+            creatingqueue=1
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, end = 16.dp),
+        shape = RoundedCornerShape(9.dp),
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = Color.Blue,
+            contentColor = Color.White
+        )
+    ) {
+
+        Text(text = "CREATE CENTER", modifier = Modifier.padding(6.dp))
+    }
+
+
+
+}
+
+
+       else if (controlsim==0){
+            CircularProgressIndicator()
+        }
+
+        else if(creatingqueue==3){
+        Card(modifier = Modifier.fillMaxSize(80f)) {
             Column() {
                 Text("Name: Cov-19 Vaccine Queue")
                 Text("Capacity: 21")
-                Text("Current Number in Queue: 0")
+                Text("Current Number in Queue: "+controlincrease)
+                if(numbertime==0){
+                    simdemo.simqueuenumberincrease()
+                    numbertime=1
+
+                }
+                else if(controlincrease==1){
+                    simdemo.simqueuenumberincrease()
+                }
             }
 
 
+
+
         }
 
-        if (controlsim==0){
-            CircularProgressIndicator()
-        }
+    }
         else if(creatingqueue==2){
 
     OutlinedTextField(
@@ -104,6 +168,7 @@ fun PatientHomeScreenStatefull(auth: FirebaseAuth?,onSignOut:()->Unit,simdemo:de
         onClick = {
             simdemo.simfor=0
             simdemo.simcreatingqueue(1,10000L)
+            creatingqueue=3
         },
         modifier = Modifier
             .fillMaxWidth()
@@ -121,22 +186,6 @@ fun PatientHomeScreenStatefull(auth: FirebaseAuth?,onSignOut:()->Unit,simdemo:de
 
 }
         else if (creatingqueue==1){
-    Button(
-        onClick = {
-            creatingqueue=2
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp),
-        shape = RoundedCornerShape(6.dp),
-        colors = ButtonDefaults.buttonColors(
-            backgroundColor = Color.Black,
-            contentColor = Color.White
-        )
-    ) {
-
-        Text(text = "CREATE YOUR OWN QUEUE", modifier = Modifier.padding(6.dp))
-    }
 
     Spacer(modifier = Modifier.padding(5.dp))
 

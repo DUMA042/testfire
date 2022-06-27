@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 
 class demoView: ViewModel() {
     var simfor  by  mutableStateOf(1)
+    var simincrease  by  mutableStateOf(0)
 
 fun simcreatingqueue(number:Int=1,timesim:Long=1000L){
     viewModelScope.launch{
@@ -22,10 +23,19 @@ fun simcreatingqueue(number:Int=1,timesim:Long=1000L){
     }
 }
 
+    fun simqueuenumberincrease(number:Int=1,timesim:Long=1000L){
+        viewModelScope.launch{
+            Log.d(ContentValues.TAG, "Entered the viewModelScope")
+            var triggerDelay=async { do_delay(timesim=10000) }
+            simincrease += triggerDelay.await()
+        }
+    }
+
 
 suspend fun  do_delay(number:Int=1,timesim:Long=1000L):Int{
     delay(timesim)
         return number
 }
+
 
 }

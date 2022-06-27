@@ -7,6 +7,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -17,6 +18,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.testfire.NavComponent.NavTypes.NavScreens
 import com.example.testfire.UIElement.PatientUIForVacineQ.PatientHomeScreenStatefull
+import com.example.testfire.UIElement.PatientUIForVacineQ.displayq
+import com.example.testfire.demoqueueview
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
@@ -29,6 +32,7 @@ fun NavigationGraph(navController: NavHostController,auth: FirebaseAuth?,onSignO
             PatientDetailScreen()
         }
         composable(route = NavScreens.QueueScreen.route){
+
             QueueScreen()
         }
     }
@@ -81,8 +85,8 @@ fun HomeScreen(auth: FirebaseAuth?,onSignOut:()->Unit){
 
 
 @Composable
-fun QueueScreen(){
-    Text("On the Queue Screen")
+fun QueueScreen(indqueue: demoqueueview =viewModel()){
+    displayq(indqueue)
 }
 
 
