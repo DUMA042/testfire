@@ -226,7 +226,8 @@ MessageRow(message)
 fun displayEachHealthCenterDetails(navController: NavController,healthcenterinfo:HealthPublicInfo=HealthPublicInfo(),patientDetailViewModel: PatientDetailViewModel = viewModel()){
 var  listofQueues=healthcenterinfo.QueueList
 val currentCenter by remember { mutableStateOf(healthcenterinfo) }
-val passingContainer =IndividualHealthCenterContainer(patientDetailViewModel.getUSer(),currentCenter)
+val passingContainer =
+    patientDetailViewModel.getUSer()?.let { IndividualHealthCenterContainer(it,currentCenter) }
     Surface( elevation = 7.dp, modifier = Modifier
         .fillMaxWidth()
         .padding(start = 4.dp,top=7.dp,end=4.dp), color = HealthCenterSurfaceColor, shape = MaterialTheme.shapes.small,onClick = {navController.currentBackStackEntry?.savedStateHandle?.set("HealthCenter",passingContainer)

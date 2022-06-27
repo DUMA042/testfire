@@ -15,6 +15,8 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -25,6 +27,20 @@ class HealthCenterIndividualQueuesViewModel: ViewModel() {
     val linkToFireStore= Firebase.firestore
     var queueincenter: QueueDetailsforHealthCenters=QueueDetailsforHealthCenters()
     var listofQueueopen = mutableListOf<QueueDetailsforHealthCenters>().toMutableStateList()
+    var simfor  by  mutableStateOf(0)
+
+    fun simcreatingqueue(number:Int=1,timesim:Long=1000L){
+        viewModelScope.launch{
+            Log.d(ContentValues.TAG, "Entered the viewModelScope")
+            var triggerDelay=async { do_delay() }
+            simfor=triggerDelay.await()
+        }
+    }
+
+    suspend fun  do_delay(number:Int=1,timesim:Long=100000L):Int{
+        delay(timesim)
+        return number
+    }
 
     fun setcenterDetails(currentUser: FirebaseUser?,currenthealthcenter:String){
 

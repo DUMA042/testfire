@@ -28,7 +28,7 @@ import kotlinx.coroutines.launch
 
     var isNewUser by mutableStateOf(true)
 
-     lateinit var usertoken:FirebaseUser
+     var usertoken:FirebaseUser?=null
 
   var patientDetailRepository:PatientIdentifierInfoRepo= PatientIdentifierInfoRepo(null)
 
@@ -164,7 +164,7 @@ import kotlinx.coroutines.launch
 
     }
 
-fun getUSer():FirebaseUser{
+fun getUSer(): FirebaseUser? {
     return usertoken
 }
 

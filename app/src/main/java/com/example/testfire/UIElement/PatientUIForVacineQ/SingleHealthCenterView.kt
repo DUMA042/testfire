@@ -32,7 +32,7 @@ import com.google.firebase.auth.FirebaseUser
 
 
 @Composable
-fun currentHealthCenterDetail(auth: FirebaseAuth?,result:IndividualHealthCenterContainer?,individualQueuesViewModel: HealthCenterIndividualQueuesViewModel){
+fun currentHealthCenterDetail(auth: FirebaseAuth?,result:IndividualHealthCenterContainer?,individualQueuesViewModel: HealthCenterIndividualQueuesViewModel= viewModel()){
 
 var indd=individualQueuesViewModel
 
@@ -46,8 +46,10 @@ var indd=individualQueuesViewModel
     else{
         indd.setcenterDetails(result?.currentuser,result?.healthdeDatial?.healthCenterUID?:"")
         Column() {
-            Text(text = "The Name "+ (result?.healthdeDatial?.Name ?: null))
-            Text(text = "The ID "+ (result?.currentuser?.uid ?: null))
+            Text(text = "NAME "+ (result?.healthdeDatial?.Name ?: null))
+            Text(text = "EMAIL "+ (result?.healthdeDatial?.Email ?: null))
+            Text(text = "LOCATION "+ (result?.healthdeDatial?.LocationName ?: null))
+
             LazyColumn{
                 items(indd.listofQueueopen){HealthCenter->
                    // displayEachHealthCenterDetails(navController,HealthCenter)
@@ -71,13 +73,18 @@ var indd=individualQueuesViewModel
 }
 
 @Composable
-fun queueopenUI(allCurrentOpenQueue:QueueDetailsforHealthCenters) {
+fun queueopenUI(allCurrentOpenQueue:QueueDetailsforHealthCenters,individualQueuesViewModel: HealthCenterIndividualQueuesViewModel= viewModel()) {
  var queueopenunit by remember{ mutableStateOf(allCurrentOpenQueue) }
  var buttontext by remember { mutableStateOf("JOIN")}
+ var buu by  remember { mutableStateOf(individualQueuesViewModel.simfor)}
  var youravgwaittime by remember{ mutableStateOf("6min")}
  var currentnumber by remember{ mutableStateOf(queueopenunit.currentnumber.toString())}
  val context = LocalContext.current
 
+    if(buu==1){
+        buttontext="JOIN"
+        youravgwaittime="8.7"
+    }
     Card(
         modifier = Modifier
             .height(250.dp)
@@ -101,10 +108,12 @@ fun queueopenUI(allCurrentOpenQueue:QueueDetailsforHealthCenters) {
 
             if(buttontext=="CANCEL"){
                 Row() {
+
                     Text(text = youravgwaittime)
                     Text(text = " your predicted waiting time ")
                 }
             }
+
 
             Row() {
                 Text(text = currentnumber)
@@ -136,8 +145,14 @@ fun queueopenUI(allCurrentOpenQueue:QueueDetailsforHealthCenters) {
                      currentnumber=(queueopenunit.currentnumber+1).toString()
                     buttontext="CANCEL"
                         Toast.makeText(context,"You have Entered the Queue", Toast.LENGTH_SHORT).show()
+                        if(buu!=1){
+                            individualQueuesViewModel.simcreatingqueue()
+                        }
+
+
                        }
-                    else {buttontext="JOIN"
+                    else {
+                        buttontext="JOIN"
                         currentnumber=(queueopenunit.currentnumber).toString()
                         Toast.makeText(context,"You have been Left the Queue", Toast.LENGTH_SHORT).show()    }
                               },
