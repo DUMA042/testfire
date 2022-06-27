@@ -3,77 +3,168 @@ package com.example.testfire.UIElement.PatientUIForVacineQ
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.Card
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.*
 import androidx.compose.material.TabRowDefaults.Divider
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.testfire.Enter
+import com.example.testfire.demoView
 import com.example.testfire.ui.theme.TestfireTheme
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun PatientHomeScreenStatefull(auth: FirebaseAuth?,onSignOut:()->Unit){
-
+fun PatientHomeScreenStatefull(auth: FirebaseAuth?,onSignOut:()->Unit,simdemo:demoView= viewModel()){
+    var controlsim =simdemo.simfor
+    var Nametext by remember { mutableStateOf("") }
+    var Capacitytext by remember { mutableStateOf("") }
+    var Descriptiontext by remember { mutableStateOf("") }
+    val keyboardController =  LocalSoftwareKeyboardController.current
+    val (focusCapacity,focusDescription) = remember { FocusRequester.createRefs()}
     var queuelist: MutableList<String> = mutableListOf("VAc", "Work", "Time")
-    VaccineCenterDetails(queuelist,onSignOut)
+    var creatingqueue by remember{mutableStateOf(1)}
+
+    
+    Column(modifier = Modifier.fillMaxSize(),verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+
+        Card() {
+            Column() {
+                Text("Name: Cov-19 Vaccine Queue")
+                Text("Capacity: 21")
+                Text("Current Number in Queue: 0")
+            }
+
+
+        }
+
+        if (controlsim==0){
+            CircularProgressIndicator()
+        }
+        else if(creatingqueue==2){
+
+    OutlinedTextField(
+        value = Nametext,
+        modifier = Modifier
+            .padding(top = 7.dp)
+            .align(Alignment.CenterHorizontally),
+        onValueChange = { Nametext = it },
+        label = { Text("NAME:",fontSize=20.sp) },
+        placeholder={ Text("Your Queue Name") },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text,imeAction = ImeAction.Next),
+        keyboardActions = KeyboardActions(onNext = {focusDescription.requestFocus()})
+    )
+
+    OutlinedTextField(
+        value = Descriptiontext,
+        modifier = Modifier
+            .padding(top = 7.dp)
+            .align(Alignment.CenterHorizontally)
+            .focusRequester(focusDescription),
+        onValueChange = { Descriptiontext = it },
+        label = { Text("Description:",fontSize=20.sp) },
+        placeholder={ Text("Summary of the Queue Purpose") },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text,imeAction = ImeAction.Next),
+        keyboardActions = KeyboardActions(onNext = {focusCapacity.requestFocus()})
+
+    )
+
+
+    OutlinedTextField(
+        value = Capacitytext,
+        modifier = Modifier
+            .padding(top = 7.dp)
+            .align(Alignment.CenterHorizontally)
+            .focusRequester(focusCapacity),
+        onValueChange = { Capacitytext = it },
+        label = { Text("Queue Capacity:",fontSize=20.sp) },
+        placeholder={ Text("20") },
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number,imeAction = ImeAction.Done),
+        keyboardActions = KeyboardActions (onDone = {keyboardController?.hide()})
+
+    )
+
+    Button(
+        onClick = {
+            simdemo.simfor=0
+            simdemo.simcreatingqueue(1,10000L)
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, end = 16.dp),
+        shape = RoundedCornerShape(9.dp),
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = Color.Black,
+            contentColor = Color.White
+        )
+    ) {
+
+        Text(text = "CREATE Queue", modifier = Modifier.padding(6.dp))
+    }
+
+
+}
+        else if (creatingqueue==1){
+    Button(
+        onClick = {
+            creatingqueue=2
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, end = 16.dp),
+        shape = RoundedCornerShape(6.dp),
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = Color.Black,
+            contentColor = Color.White
+        )
+    ) {
+
+        Text(text = "CREATE YOUR OWN QUEUE", modifier = Modifier.padding(6.dp))
+    }
+
+    Spacer(modifier = Modifier.padding(5.dp))
+
+    Button(
+        onClick = {
+            creatingqueue=2
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, end = 16.dp),
+        shape = RoundedCornerShape(6.dp),
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = Color.Black,
+            contentColor = Color.White
+        )
+    ) {
+
+        Text(text = "Cov-19 Vaccine Queue", modifier = Modifier.padding(6.dp))
+    }
+        }
+
+    }
 
 }
 
 @Composable
 fun VaccineCenterDetails(queulist:MutableList<String>,onSignOut:()->Unit){
-Column() {
-   Text(text = "Name:")
-   Spacer(modifier = Modifier.padding(top=7.dp))
-   Text(text = "Email:")
-   Spacer(modifier = Modifier.padding(top=7.dp))
-   Text(text = "Location:")
-   Spacer(modifier = Modifier.padding(top=7.dp))
 
-    LazyColumn {
-        // Add a single item
-
-
-        // Add 5 items
-        items(queulist.size) { index ->
-            Text(text = "Item: ${queulist[index]}")
-        }
-
-
-    }
-
-   Row() {
-       Card(
-           elevation = 7.dp, modifier = Modifier
-               .width(68.dp)
-               .padding(2.dp), shape = RoundedCornerShape(8.dp)
-           ){
-           Text(text ="Work", modifier = Modifier.fillMaxWidth() )
-       }
-   }
-
-    Button(onClick = {
-        Firebase.auth.signOut()
-        onSignOut()
-       }) {
-        /**This is for the Sign out button*/
-
-        /**This is for the Sign out button*/
-
-        Text(text = "Sign Out")
-    }
-
-    Divider(color = Color.Black, modifier = Modifier
-        .fillMaxWidth()
-        .width(1.dp))
-}
 
 
 

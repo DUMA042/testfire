@@ -296,23 +296,7 @@ fun buildUI(onClick:()->Unit){
             Text(text = "Sign in with Google", modifier = Modifier.padding(6.dp))
         }
 
-        Spacer(modifier = Modifier.padding(3.dp))
-        Button(
-            onClick = {
 
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp),
-            shape = RoundedCornerShape(6.dp),
-            colors = ButtonDefaults.buttonColors(
-                backgroundColor = Black,
-                contentColor = White
-            )
-        ) {
-
-            Text(text = "Go to next space", modifier = Modifier.padding(6.dp))
-        }
 
 
     }
