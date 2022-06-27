@@ -20,17 +20,24 @@ class IndividualQueueRepo(currentUser: FirebaseUser?,centerUI:String) {
     val linkToFireStore= Firebase.firestore
     val healthcenterUI=centerUI
 
-  fun getopenqueues(){
-    val dataresult=linkToFireStore.collection("Health Centers")
+ suspend fun getopenqueues(){
+   val gh= linkToFireStore.collection("Health Centers")
         .document(healthcenterUI).collection("QueueCollection")
 
-         dataresult.whereEqualTo("QueueVisibility", true).get().addOnSuccessListener { document ->
-             if (document != null) {
-                 for (docc in document) {
-                     Log.d(TAG, "*************The Health Center open queue is ${docc.data}/n")
-                 }
-             }
-         }
+   val gg=gh
+        .whereEqualTo("QueueVisiblity", true).get().addOnSuccessListener { result ->
+          if (result != null) {
+              Log.d(TAG,"MMMMMMM${result.size()}")
+              for (docc in result) {
+                  Log.d(TAG, "*************The Health Center open queue is ${docc.data}")
+              }
+          }
+      }
+        .addOnFailureListener { exception ->
+            Log.w(TAG, "Error getting documents: ", exception)
+        }
+
+
 
 }
 

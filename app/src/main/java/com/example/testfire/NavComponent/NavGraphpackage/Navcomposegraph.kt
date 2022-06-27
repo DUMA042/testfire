@@ -2,6 +2,7 @@ package com.example.testfire.NavComponent.NavGraphpackage
 
 import android.content.ContentValues
 import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
@@ -9,6 +10,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.*
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -21,13 +23,14 @@ import com.example.testfire.NavComponent.NavTypes.NavScreens
 import com.example.testfire.UIElement.PatientUIForVacineQ.PatientHomeScreenStatefull
 import com.example.testfire.UIElement.PatientUIForVacineQ.currentHealthCenterDetail
 import com.example.testfire.UseCases.IndividualHealthCenterContainer
+import com.example.testfire.ViewModels.HealthCenterIndividualQueuesViewModel
 import com.example.testfire.ViewModels.PatientDetailViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 
 
 @Composable
-fun NavigationGraph(navController: NavHostController,auth: FirebaseAuth?,onSignOut:()->Unit,patientDetailViewModel: PatientDetailViewModel= viewModel()){
+fun NavigationGraph(navController: NavHostController,auth: FirebaseAuth?,onSignOut:()->Unit){
     NavHost(navController = navController, startDestination = NavScreens.HomeScreen.route){
         composable(route= NavScreens.HomeScreen.route){
             HomeScreen(auth,onSignOut,navController)
@@ -37,6 +40,7 @@ fun NavigationGraph(navController: NavHostController,auth: FirebaseAuth?,onSignO
         }
         composable(route = NavScreens.QueueScreen.route){
             val result=navController.previousBackStackEntry?.savedStateHandle?.get<IndividualHealthCenterContainer?>("HealthCenter")
+            //val vm: PatientDetailViewModel = viewModel()
             currentHealthCenterScreen(auth,result)
         }
     }
@@ -45,12 +49,12 @@ fun NavigationGraph(navController: NavHostController,auth: FirebaseAuth?,onSignO
 
 
 @Composable
-fun MainScreen(auth: FirebaseAuth?,onSignOut:()->Unit,patientDetailViewModel: PatientDetailViewModel= viewModel()){
+fun MainScreen(auth: FirebaseAuth?,onSignOut:()->Unit){
     val navController = rememberNavController()
     Scaffold(
         bottomBar = { Bottombar(navController = navController) }
     ) {
-        NavigationGraph(navController = navController,auth,onSignOut,patientDetailViewModel)
+        NavigationGraph(navController = navController,auth,onSignOut)
     }
 
 }
@@ -90,9 +94,9 @@ fun HomeScreen(auth: FirebaseAuth?,onSignOut:()->Unit,navController: NavControll
 
 
 @Composable
-fun currentHealthCenterScreen(auth: FirebaseAuth?,result:IndividualHealthCenterContainer?){
+fun currentHealthCenterScreen(auth: FirebaseAuth?,result:IndividualHealthCenterContainer?,individualQueuesViewModel: HealthCenterIndividualQueuesViewModel= viewModel()){
     //var HealthCenterState=patientDetailViewModel.currentViewHealthCenters
-    currentHealthCenterDetail(auth,result)
+    currentHealthCenterDetail(auth,result,individualQueuesViewModel)
 
 
     //Text("On the Queue Screen")
