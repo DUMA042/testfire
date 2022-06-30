@@ -34,6 +34,7 @@ import com.google.firebase.auth.FirebaseUser
 @Composable
 fun currentHealthCenterDetail(auth: FirebaseAuth?,result:IndividualHealthCenterContainer?,individualQueuesViewModel: HealthCenterIndividualQueuesViewModel= viewModel()){
     individualQueuesViewModel.setupopenqueues(result?.healthdeDatial?.healthCenterUID?:null)
+    individualQueuesViewModel.setupinqueuelister()
     setupupdates(result)
 
 }

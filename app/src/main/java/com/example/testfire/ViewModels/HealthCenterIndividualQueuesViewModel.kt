@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.testfire.HealthCenterClasses.QueueDetailsforHealthCenters
 import com.example.testfire.PatientDataClasses.PatientPublicInfo
 import com.example.testfire.Repositorypack.IndividualQueueRepo
+import com.example.testfire.UseCases.patientinqueue
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.ktx.firestore
@@ -34,6 +35,8 @@ class HealthCenterIndividualQueuesViewModel: ViewModel() {
     val listofQueueopen = mutableListOf<QueueDetailsforHealthCenters>().toMutableStateList()
     var simfor  by  mutableStateOf(1)
     var checkforqueuechange by  mutableStateOf(0)
+    var contrlloop by mutableStateOf(patientinqueue())
+
     private var functions: FirebaseFunctions = Firebase.functions
 
 
@@ -52,22 +55,24 @@ class HealthCenterIndividualQueuesViewModel: ViewModel() {
         delay(timesim)
         return number
     }*/
-fun setupinqueuelister(currentUser: FirebaseUser?=null){
-    if (currentUser != null) {
-        linkToFireStore.collection("Patient").document(currentUser.uid).collection("InQueue")
-            .document(currentUser.uid).addSnapshotListener{ snapshot,e->
+fun setupinqueuelister(){
+        linkToFireStore.collection("Patient").document("IFruEGQLXKUlkZPJrXuMqIzZJY23").collection("InQueue")
+            .document("IFruEGQLXKUlkZPJrXuMqIzZJY23").addSnapshotListener{ snapshot,e->
                 e?.let {
                     return@addSnapshotListener
                 }
                 snapshot?.let {
                     Log.d(ContentValues.TAG, "Current data: ${it.data}")
-
+                   contrlloop= it.toObject(patientinqueue::class.java)!!
+                    if(contrlloop.inqueue){
+                        simfor=1
+                    }
                     //patientInfodetailsobject= it.toObject(PatientPublicInfo::class.java)!!
                     //Log.d(ContentValues.TAG, "This is for the object: $patientInfodetailsobject")
                 }
 
             }
-    }
+
 }
 
     fun setupopenqueues(currenthealthcenter:String?){
