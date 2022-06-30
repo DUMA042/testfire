@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -26,29 +27,66 @@ class HealthCenterIndividualQueuesViewModel: ViewModel() {
 
     val linkToFireStore= Firebase.firestore
     var queueincenter: QueueDetailsforHealthCenters=QueueDetailsforHealthCenters()
-    var listofQueueopen = mutableListOf<QueueDetailsforHealthCenters>().toMutableStateList()
+    val listofQueueopen = mutableListOf<QueueDetailsforHealthCenters>().toMutableStateList()
     var simfor  by  mutableStateOf(0)
+    var checkforqueuechange by  mutableStateOf(0)
 
+
+
+
+    /*
     fun simcreatingqueue(number:Int=1,timesim:Long=1000L){
         viewModelScope.launch{
             Log.d(ContentValues.TAG, "Entered the viewModelScope")
             var triggerDelay=async { do_delay() }
             simfor=triggerDelay.await()
         }
-    }
+    }*/
 
+/*
     suspend fun  do_delay(number:Int=1,timesim:Long=100000L):Int{
         delay(timesim)
         return number
-    }
+    }*/
 
+
+    fun setupopenqueues(currenthealthcenter:String?){
+
+        if (currenthealthcenter != null) {
+            linkToFireStore.collection("Health Centers")
+                .document(currenthealthcenter).collection("QueueCollection")
+                .whereEqualTo("QueueVisiblity", true).addSnapshotListener { value, e ->
+                    e?.let {
+                        return@addSnapshotListener
+                    }
+                    value?.let {
+                        var templist=mutableListOf<QueueDetailsforHealthCenters>()
+                        for(doc in it){
+                          var uniqueid=doc.id
+                          var gh=doc.toObject(QueueDetailsforHealthCenters::class.java)
+                            gh.idunique=uniqueid
+
+                            //templist.add(doc.toObject(QueueDetailsforHealthCenters::class.java))
+                            listofQueueopen.add(gh)
+                            //Log.d(ContentValues.TAG, "*************The Health Center open queue is ${doc.data}")
+
+                        }
+                        //listofQueueopen.addAll(templist)
+                       // Log.d(ContentValues.TAG, "++++++++++++++The Health Center open queue is ${listofQueueopen}")
+
+
+
+                    }
+
+
+                }
+
+        }
+
+    }
     fun setcenterDetails(currentUser: FirebaseUser?,currenthealthcenter:String){
 
-     /*   var repos = IndividualQueueRepo(currentUser, currenthealthcenter)
-viewModelScope.launch {
-    repos.getopenqueues()
-}
-        */
+
         currenthealthcenter.let {
             if (it!=""){
                 var templist=mutableListOf<QueueDetailsforHealthCenters>()
@@ -64,7 +102,7 @@ viewModelScope.launch {
                                 Log.d(ContentValues.TAG, "*************The Health Center open queue is ${docc.data}")
                             }
                         }
-                         listofQueueopen=templist.toMutableStateList()
+                         //listofQueueopen=templist.toMutableStateList()
 
                     }
                     .addOnFailureListener { exception ->

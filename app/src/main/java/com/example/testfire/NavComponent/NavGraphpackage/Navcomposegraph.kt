@@ -4,16 +4,14 @@ import android.content.ContentValues
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.*
 import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -82,8 +80,13 @@ fun RowScope.AddItem(screen: NavScreens, currentDestination: NavDestination?, na
     BottomNavigationItem(label={Text(text=screen.title)}, icon = {},selected = currentDestination?.hierarchy?.any{
         it.route==screen.route
 
-    }==true, onClick = {
-        navController.navigate(screen.route)
+    }==true,
+        unselectedContentColor = LocalContentColor.current.copy(alpha=ContentAlpha.disabled),
+                onClick = {
+        navController.navigate(screen.route){
+            popUpTo(navController.graph.findStartDestination().id)
+            launchSingleTop=true
+        }
     })
 }
 

@@ -33,26 +33,35 @@ import com.google.firebase.auth.FirebaseUser
 
 @Composable
 fun currentHealthCenterDetail(auth: FirebaseAuth?,result:IndividualHealthCenterContainer?,individualQueuesViewModel: HealthCenterIndividualQueuesViewModel= viewModel()){
+    individualQueuesViewModel.setupopenqueues(result?.healthdeDatial?.healthCenterUID?:null)
+    setupupdates(result)
 
-var indd=individualQueuesViewModel
+}
+
+@Composable
+fun setupupdates(result:IndividualHealthCenterContainer?,individualQueuesViewModel: HealthCenterIndividualQueuesViewModel= viewModel()){
+    var indd=individualQueuesViewModel
 
 
     var nn  by rememberSaveable { mutableStateOf(result) }
+
     if (nn==null){
-       // Text(text = "No Queue Selected ")
-       // queueopenUI()
+        Text(text = "No Queue Selected ")
+        // queueopenUI()
         //rradiobutton()
     }
     else{
-        indd.setcenterDetails(result?.currentuser,result?.healthdeDatial?.healthCenterUID?:"")
+        //indd.setcenterDetails(result?.currentuser,result?.healthdeDatial?.healthCenterUID?:"")
         Column() {
             Text(text = "NAME "+ (result?.healthdeDatial?.Name ?: null))
             Text(text = "EMAIL "+ (result?.healthdeDatial?.Email ?: null))
             Text(text = "LOCATION "+ (result?.healthdeDatial?.LocationName ?: null))
 
+
+
             LazyColumn{
-                items(indd.listofQueueopen){HealthCenter->
-                   // displayEachHealthCenterDetails(navController,HealthCenter)
+                items(individualQueuesViewModel.listofQueueopen){HealthCenter->
+                    // displayEachHealthCenterDetails(navController,HealthCenter)
                     queueopenUI(HealthCenter)
                 }
             }
@@ -69,8 +78,8 @@ var indd=individualQueuesViewModel
 
 
     }
-
 }
+
 
 @Composable
 fun queueopenUI(allCurrentOpenQueue:QueueDetailsforHealthCenters,individualQueuesViewModel: HealthCenterIndividualQueuesViewModel= viewModel()) {
@@ -80,6 +89,7 @@ fun queueopenUI(allCurrentOpenQueue:QueueDetailsforHealthCenters,individualQueue
  var youravgwaittime by remember{ mutableStateOf("6min")}
  var currentnumber by remember{ mutableStateOf(queueopenunit.currentnumber.toString())}
  val context = LocalContext.current
+
 
     if(buu==1){
         buttontext="JOIN"
@@ -108,7 +118,6 @@ fun queueopenUI(allCurrentOpenQueue:QueueDetailsforHealthCenters,individualQueue
 
             if(buttontext=="CANCEL"){
                 Row() {
-
                     Text(text = youravgwaittime)
                     Text(text = " your predicted waiting time ")
                 }
@@ -117,6 +126,7 @@ fun queueopenUI(allCurrentOpenQueue:QueueDetailsforHealthCenters,individualQueue
 
             Row() {
                 Text(text = currentnumber)
+
                 Text(text = " persons has entered the queue")
             }
             Row() {
@@ -145,9 +155,7 @@ fun queueopenUI(allCurrentOpenQueue:QueueDetailsforHealthCenters,individualQueue
                      currentnumber=(queueopenunit.currentnumber+1).toString()
                     buttontext="CANCEL"
                         Toast.makeText(context,"You have Entered the Queue", Toast.LENGTH_SHORT).show()
-                        if(buu!=1){
-                            individualQueuesViewModel.simcreatingqueue()
-                        }
+
 
 
                        }
