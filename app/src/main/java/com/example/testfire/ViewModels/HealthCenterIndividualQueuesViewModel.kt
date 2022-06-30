@@ -32,7 +32,7 @@ class HealthCenterIndividualQueuesViewModel: ViewModel() {
     val linkToFireStore= Firebase.firestore
     var queueincenter: QueueDetailsforHealthCenters=QueueDetailsforHealthCenters()
     val listofQueueopen = mutableListOf<QueueDetailsforHealthCenters>().toMutableStateList()
-    var simfor  by  mutableStateOf(0)
+    var simfor  by  mutableStateOf(1)
     var checkforqueuechange by  mutableStateOf(0)
     private var functions: FirebaseFunctions = Firebase.functions
 
@@ -52,7 +52,23 @@ class HealthCenterIndividualQueuesViewModel: ViewModel() {
         delay(timesim)
         return number
     }*/
+fun setupinqueuelister(currentUser: FirebaseUser?=null){
+    if (currentUser != null) {
+        linkToFireStore.collection("Patient").document(currentUser.uid).collection("InQueue")
+            .document(currentUser.uid).addSnapshotListener{ snapshot,e->
+                e?.let {
+                    return@addSnapshotListener
+                }
+                snapshot?.let {
+                    Log.d(ContentValues.TAG, "Current data: ${it.data}")
 
+                    //patientInfodetailsobject= it.toObject(PatientPublicInfo::class.java)!!
+                    //Log.d(ContentValues.TAG, "This is for the object: $patientInfodetailsobject")
+                }
+
+            }
+    }
+}
 
     fun setupopenqueues(currenthealthcenter:String?){
 
@@ -113,6 +129,7 @@ class HealthCenterIndividualQueuesViewModel: ViewModel() {
                 result
             }
 
+
     }
 
     //----------------------------------------------------------------------------------
@@ -120,7 +137,7 @@ class HealthCenterIndividualQueuesViewModel: ViewModel() {
     //--------------------------------------Also for functions-------------------------
     fun callAddMessage(inputMessage: String){
         // [START call_add_message]
-
+        simfor=0
         addPatientToqueue(inputMessage)
             .addOnCompleteListener { task ->
                 if (!task.isSuccessful) {
@@ -130,6 +147,7 @@ class HealthCenterIndividualQueuesViewModel: ViewModel() {
                         val details = e.details
                     }
                 }
+
             }
 
         //callAddon("addMessage")

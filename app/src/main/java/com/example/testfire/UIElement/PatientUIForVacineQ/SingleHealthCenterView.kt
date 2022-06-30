@@ -42,7 +42,6 @@ fun currentHealthCenterDetail(auth: FirebaseAuth?,result:IndividualHealthCenterC
 fun setupupdates(result:IndividualHealthCenterContainer?,individualQueuesViewModel: HealthCenterIndividualQueuesViewModel= viewModel()){
     var indd=individualQueuesViewModel
 
-
     var nn  by rememberSaveable { mutableStateOf(result) }
 
     if (nn==null){
@@ -85,16 +84,12 @@ fun setupupdates(result:IndividualHealthCenterContainer?,individualQueuesViewMod
 fun queueopenUI(allCurrentOpenQueue:QueueDetailsforHealthCenters,individualQueuesViewModel: HealthCenterIndividualQueuesViewModel= viewModel()) {
  var queueopenunit by remember{ mutableStateOf(allCurrentOpenQueue) }
  var buttontext by remember { mutableStateOf("JOIN")}
- var buu by  remember { mutableStateOf(individualQueuesViewModel.simfor)}
+ var buu =individualQueuesViewModel.simfor
  var youravgwaittime by remember{ mutableStateOf("6min")}
  var currentnumber by remember{ mutableStateOf(queueopenunit.currentnumber.toString())}
  val context = LocalContext.current
 
 
-    if(buu==1){
-        buttontext="JOIN"
-        youravgwaittime="8.7"
-    }
     Card(
         modifier = Modifier
             .height(250.dp)
@@ -103,7 +98,7 @@ fun queueopenUI(allCurrentOpenQueue:QueueDetailsforHealthCenters,individualQueue
         shape = RoundedCornerShape(8.dp),
         backgroundColor = OpenQueueSurfaceColor
     ) {
-        Column() {
+        Column {
 
             Text(queueopenunit.QueueName, modifier = Modifier.align(Alignment.CenterHorizontally))
 
@@ -136,7 +131,13 @@ fun queueopenUI(allCurrentOpenQueue:QueueDetailsforHealthCenters,individualQueue
             Row() {
                 Text(text = queueopenunit.Avgqueuetime)
                 Text(text = " Avg wait")
+
+                if(buu==0){
+                    CircularProgressIndicator()
+                }
+
             }
+
 
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
