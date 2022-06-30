@@ -41,7 +41,7 @@ fun currentHealthCenterDetail(auth: FirebaseAuth?,result:IndividualHealthCenterC
 @Composable
 fun setupupdates(result:IndividualHealthCenterContainer?,individualQueuesViewModel: HealthCenterIndividualQueuesViewModel= viewModel()){
     var indd=individualQueuesViewModel
-
+    var hhk=individualQueuesViewModel.checkforqueuechange
 
     var nn  by rememberSaveable { mutableStateOf(result) }
 
@@ -62,7 +62,7 @@ fun setupupdates(result:IndividualHealthCenterContainer?,individualQueuesViewMod
             LazyColumn{
                 items(individualQueuesViewModel.listofQueueopen){HealthCenter->
                     // displayEachHealthCenterDetails(navController,HealthCenter)
-                    queueopenUI(HealthCenter)
+                    queueopenUI(HealthCenter,hhk)
                 }
             }
 
@@ -82,7 +82,7 @@ fun setupupdates(result:IndividualHealthCenterContainer?,individualQueuesViewMod
 
 
 @Composable
-fun queueopenUI(allCurrentOpenQueue:QueueDetailsforHealthCenters,individualQueuesViewModel: HealthCenterIndividualQueuesViewModel= viewModel()) {
+fun queueopenUI(allCurrentOpenQueue:QueueDetailsforHealthCenters,hhk:Int=1,individualQueuesViewModel: HealthCenterIndividualQueuesViewModel= viewModel()) {
  var queueopenunit by remember{ mutableStateOf(allCurrentOpenQueue) }
  var buttontext by remember { mutableStateOf("JOIN")}
  var buu by  remember { mutableStateOf(individualQueuesViewModel.simfor)}
@@ -125,7 +125,7 @@ fun queueopenUI(allCurrentOpenQueue:QueueDetailsforHealthCenters,individualQueue
 
 
             Row() {
-                Text(text = currentnumber)
+                Text(text = currentnumber + hhk.toString())
 
                 Text(text = " persons has entered the queue")
             }

@@ -68,9 +68,11 @@ class HealthCenterIndividualQueuesViewModel: ViewModel() {
 
                             //templist.add(doc.toObject(QueueDetailsforHealthCenters::class.java))
                             listofQueueopen.add(gh)
+
                             //Log.d(ContentValues.TAG, "*************The Health Center open queue is ${doc.data}")
 
                         }
+                        checkforqueuechange++
                         //listofQueueopen.addAll(templist)
                        // Log.d(ContentValues.TAG, "++++++++++++++The Health Center open queue is ${listofQueueopen}")
 
