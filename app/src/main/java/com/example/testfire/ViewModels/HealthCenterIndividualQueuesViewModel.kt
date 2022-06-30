@@ -12,9 +12,13 @@ import androidx.lifecycle.viewModelScope
 import com.example.testfire.HealthCenterClasses.QueueDetailsforHealthCenters
 import com.example.testfire.PatientDataClasses.PatientPublicInfo
 import com.example.testfire.Repositorypack.IndividualQueueRepo
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.functions.FirebaseFunctions
+import com.google.firebase.functions.FirebaseFunctionsException
+import com.google.firebase.functions.ktx.functions
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -30,7 +34,7 @@ class HealthCenterIndividualQueuesViewModel: ViewModel() {
     val listofQueueopen = mutableListOf<QueueDetailsforHealthCenters>().toMutableStateList()
     var simfor  by  mutableStateOf(0)
     var checkforqueuechange by  mutableStateOf(0)
-
+    private var functions: FirebaseFunctions = Firebase.functions
 
 
 
@@ -61,6 +65,7 @@ class HealthCenterIndividualQueuesViewModel: ViewModel() {
                     }
                     value?.let {
                         var templist=mutableListOf<QueueDetailsforHealthCenters>()
+                        listofQueueopen.clear()
                         for(doc in it){
                           var uniqueid=doc.id
                           var gh=doc.toObject(QueueDetailsforHealthCenters::class.java)
@@ -86,6 +91,53 @@ class HealthCenterIndividualQueuesViewModel: ViewModel() {
         }
 
     }
+
+
+    //--------------------------------For Cloud functions--------------------------------
+    private fun addPatientToqueue(text: String): Task<String> {
+        // Create the arguments to the callable function.
+        val data = hashMapOf(
+            "healthcenterid" to "ROXlJPAtUX0ja6dOzrrG",
+            "queueopenid" to "yJH7RhSuAlktmnBcTz5k",
+            "patientid" to "IFruEGQLXKUlkZPJrXuMqIzZJY23"
+        )
+
+        return functions
+            .getHttpsCallable("addToqueue")
+            .call(data)
+            .continueWith { task ->
+                // This continuation runs on either success or failure, but if the task
+                // has failed then result will throw an Exception which will be
+                // propagated down.
+                val result = task.result?.data as String
+                result
+            }
+
+    }
+
+    //----------------------------------------------------------------------------------
+
+    //--------------------------------------Also for functions-------------------------
+    fun callAddMessage(inputMessage: String){
+        // [START call_add_message]
+
+        addPatientToqueue(inputMessage)
+            .addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    val e = task.exception
+                    if (e is FirebaseFunctionsException) {
+                        val code = e.code
+                        val details = e.details
+                    }
+                }
+            }
+
+        //callAddon("addMessage")
+        // [END call_add_message]
+    }
+    //---------------------------------------------------------------------------------
+
+
     fun setcenterDetails(currentUser: FirebaseUser?,currenthealthcenter:String){
 
 
