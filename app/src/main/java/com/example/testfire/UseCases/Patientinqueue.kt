@@ -4,4 +4,4 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class patientinqueue (var inqueue:Boolean=true) : Parcelable
+data class patientinqueue (var inqueue:Boolean=true,var queueholder:String="") : Parcelable

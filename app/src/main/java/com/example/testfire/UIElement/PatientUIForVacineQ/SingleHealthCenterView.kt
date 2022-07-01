@@ -33,7 +33,8 @@ import com.google.firebase.auth.FirebaseUser
 
 @Composable
 fun currentHealthCenterDetail(auth: FirebaseAuth?,result:IndividualHealthCenterContainer?,individualQueuesViewModel: HealthCenterIndividualQueuesViewModel= viewModel()){
-    individualQueuesViewModel.setupopenqueues(result?.healthdeDatial?.healthCenterUID?:null)
+    //individualQueuesViewModel.setupopenqueues(result?.healthdeDatial?.healthCenterUID?:null)
+    individualQueuesViewModel.setupvaccinequeuelistern()
     individualQueuesViewModel.setupinqueuelister()
     setupupdates(result)
 
@@ -41,7 +42,15 @@ fun currentHealthCenterDetail(auth: FirebaseAuth?,result:IndividualHealthCenterC
 
 @Composable
 fun setupupdates(result:IndividualHealthCenterContainer?,individualQueuesViewModel: HealthCenterIndividualQueuesViewModel= viewModel()){
-    var indd=individualQueuesViewModel
+    var queueopenunit=individualQueuesViewModel.vaccinequeueopen
+    var buttontext by remember { mutableStateOf("JOIN")}
+    var buu =individualQueuesViewModel.simfor
+    var youravgwaittime by remember{ mutableStateOf("6min")}
+    var currentnumber by remember{ mutableStateOf(queueopenunit.currentnumber.toString())}
+    var buttonstatus by remember { mutableStateOf(true)}
+    val context = LocalContext.current
+
+
 
     var nn  by rememberSaveable { mutableStateOf(result) }
 
@@ -50,6 +59,133 @@ fun setupupdates(result:IndividualHealthCenterContainer?,individualQueuesViewMod
         // queueopenUI()
         //rradiobutton()
     }
+    else{
+        Column(verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally) {
+            Card(elevation = 12.dp) {
+                Column() {
+
+                    Text(text = "NAME "+ (result?.healthdeDatial?.Name ?: null))
+                    Text(text = "EMAIL "+ (result?.healthdeDatial?.Email ?: null))
+                    Text(text = "LOCATION "+ (result?.healthdeDatial?.LocationName ?: null))
+                    Text(text = "User ID  "+ (result?.currentuser?.uid))
+                    Text(text = "health center "+ (result?.healthdeDatial?.healthCenterUID))
+                    Text(text = "User center ID 2  "+ (individualQueuesViewModel.contrlloop.queueholder))
+                    //individualQueuesViewModel.contrlloop.queueholder
+
+                }
+            }
+
+            Card() {
+                Column() {
+                    Text(queueopenunit.QueueName, modifier = Modifier.align(Alignment.CenterHorizontally))
+
+                    Divider(
+                        color = Color.DarkGray,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.CenterHorizontally),
+                        thickness = 3.dp
+                    )
+
+
+                    if(buttontext=="CANCEL"){
+                        Row() {
+                            Text(text = youravgwaittime)
+                            Text(text = " your predicted waiting time ")
+                        }
+                    }
+
+                    buttonstatus = (individualQueuesViewModel.contrlloop.queueholder.equals(result?.healthdeDatial?.healthCenterUID))
+
+
+                    Row() {
+                        Text(text = currentnumber)
+
+                        Text(text = " persons has entered the queue")
+                    }
+                    Row() {
+                        Text(text = queueopenunit.QueueCapacity.toString())
+                        Text(text = " Maximum mumber of queue")
+                    }
+                    Row() {
+                        Text(text = queueopenunit.Avgqueuetime)
+                        Text(text = " Avg wait")
+
+
+                        if(buu==0){
+                            CircularProgressIndicator()
+                        }
+                        if(buu==2){
+                            Toast.makeText(context,"You have been Joined the Queue", Toast.LENGTH_SHORT).show()
+                        }
+                        if (buu==3){
+                            Toast.makeText(context,"You have been Dequeue", Toast.LENGTH_SHORT).show()
+                        }
+
+
+                    }
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        contentPadding = PaddingValues(horizontal = 6.dp)
+                    ) {
+                        items(queueopenunit.PriorityElement) { item ->
+
+                            periorityUI(item)
+                        }
+                    }
+
+                    if(buttonstatus){
+                        if(individualQueuesViewModel.contrlloop.inqueue && individualQueuesViewModel.contrlloop.queueholder==result?.healthdeDatial?.healthCenterUID){
+                            buttontext="CANCEL"
+                        }
+
+
+                        Button( modifier = Modifier.align(Alignment.CenterHorizontally),
+                            onClick = {
+                                if(buttontext=="JOIN"){
+                                    currentnumber=(queueopenunit.currentnumber+1).toString()
+                                    individualQueuesViewModel.callAddMessage("TESTING")
+                                    buttontext="CANCEL"
+                                    Toast.makeText(context,"You have Entered the Queue", Toast.LENGTH_SHORT).show()
+
+
+
+                                }
+                                else {
+                                    buttontext="JOIN"
+                                    currentnumber=(queueopenunit.currentnumber).toString()
+                                    Toast.makeText(context,"You have been Left the Queue", Toast.LENGTH_SHORT).show()    }
+                            },
+                            colors = ButtonDefaults.buttonColors(backgroundColor = JoinButtonColor)
+                        ) {
+                            Text(text = buttontext)
+                        }
+                    }
+                    else{
+                        Text(text = "YOU ARE ALREADY IN A QUEUE",modifier = Modifier.align(Alignment.CenterHorizontally))
+                    }
+
+
+
+
+                }
+
+
+
+            }
+            }
+
+        }
+
+
+
+
+
+
+
+    }
+    /*
     else{
         //indd.setcenterDetails(result?.currentuser,result?.healthdeDatial?.healthCenterUID?:"")
         Column() {
@@ -77,8 +213,8 @@ fun setupupdates(result:IndividualHealthCenterContainer?,individualQueuesViewMod
 
 
 
-    }
-}
+    }*/
+
 
 
 @Composable

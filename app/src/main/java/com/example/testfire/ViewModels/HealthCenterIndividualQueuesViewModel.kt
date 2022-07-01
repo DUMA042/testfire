@@ -36,7 +36,7 @@ class HealthCenterIndividualQueuesViewModel: ViewModel() {
     var simfor  by  mutableStateOf(1)
     var checkforqueuechange by  mutableStateOf(0)
     var contrlloop by mutableStateOf(patientinqueue())
-
+    var vaccinequeueopen by mutableStateOf(QueueDetailsforHealthCenters())
     private var functions: FirebaseFunctions = Firebase.functions
 
 
@@ -55,9 +55,39 @@ class HealthCenterIndividualQueuesViewModel: ViewModel() {
         delay(timesim)
         return number
     }*/
+
+fun setupvaccinequeuelistern(){
+    linkToFireStore.collection("Health Centers")
+        .document("ROXlJPAtUX0ja6dOzrrG").collection("QueueCollection")
+        .document("yJH7RhSuAlktmnBcTz5k").addSnapshotListener{ snapshot,e->
+            e?.let {
+                return@addSnapshotListener
+            }
+            snapshot?.let {
+                Log.d(ContentValues.TAG, "Current Data in Queue: ${it.data}")
+                contrlloop= it.toObject(patientinqueue::class.java)!!
+                var uniqueid=it.id
+                var gh=it.toObject(QueueDetailsforHealthCenters::class.java)
+                if (gh != null) {
+                    gh.idunique=uniqueid
+                    vaccinequeueopen=gh
+                }
+
+
+
+                //patientInfodetailsobject= it.toObject(PatientPublicInfo::class.java)!!
+                //Log.d(ContentValues.TAG, "This is for the object: $patientInfodetailsobject")
+            }
+
+        }
+
+}
+
+
 fun setupinqueuelister(){
         linkToFireStore.collection("Patient").document("IFruEGQLXKUlkZPJrXuMqIzZJY23").collection("InQueue")
-            .document("IFruEGQLXKUlkZPJrXuMqIzZJY23").addSnapshotListener{ snapshot,e->
+            .document("IFruEGQLXKUlkZPJrXuMqIzZJY23")
+            .addSnapshotListener{ snapshot,e->
                 e?.let {
                     return@addSnapshotListener
                 }
@@ -65,7 +95,7 @@ fun setupinqueuelister(){
                     Log.d(ContentValues.TAG, "Current data: ${it.data}")
                    contrlloop= it.toObject(patientinqueue::class.java)!!
                     if(contrlloop.inqueue){
-                        simfor=1
+                        simfor=2
                     }
                     //patientInfodetailsobject= it.toObject(PatientPublicInfo::class.java)!!
                     //Log.d(ContentValues.TAG, "This is for the object: $patientInfodetailsobject")
@@ -74,6 +104,7 @@ fun setupinqueuelister(){
             }
 
 }
+    //----------------------For the Inqueue chech also use for circular spinner-----------------
 
     fun setupopenqueues(currenthealthcenter:String?){
 
@@ -112,6 +143,7 @@ fun setupinqueuelister(){
         }
 
     }
+    //----------------------------------------------------------------------------------
 
 
     //--------------------------------For Cloud functions--------------------------------
