@@ -46,7 +46,7 @@ fun setupupdates(result:IndividualHealthCenterContainer?,individualQueuesViewMod
     var buttontext by remember { mutableStateOf("JOIN")}
     var buu =individualQueuesViewModel.simfor
     var youravgwaittime by remember{ mutableStateOf("6min")}
-    var currentnumber by remember{ mutableStateOf(queueopenunit.currentnumber.toString())}
+    var currentnumber =queueopenunit.currentnumber
     var buttonstatus by remember { mutableStateOf(true)}
     val context = LocalContext.current
 
@@ -68,9 +68,7 @@ fun setupupdates(result:IndividualHealthCenterContainer?,individualQueuesViewMod
                     Text(text = "NAME "+ (result?.healthdeDatial?.Name ?: null))
                     Text(text = "EMAIL "+ (result?.healthdeDatial?.Email ?: null))
                     Text(text = "LOCATION "+ (result?.healthdeDatial?.LocationName ?: null))
-                    Text(text = "User ID  "+ (result?.currentuser?.uid))
-                    Text(text = "health center "+ (result?.healthdeDatial?.healthCenterUID))
-                    Text(text = "User center ID 2  "+ (individualQueuesViewModel.contrlloop.queueholder))
+
                     //individualQueuesViewModel.contrlloop.queueholder
 
                 }
@@ -89,24 +87,27 @@ fun setupupdates(result:IndividualHealthCenterContainer?,individualQueuesViewMod
                     )
 
 
-                    if(buttontext=="CANCEL"){
+
                         Row() {
                             Text(text = youravgwaittime)
                             Text(text = " your predicted waiting time ")
                         }
-                    }
+
 
                     buttonstatus = (individualQueuesViewModel.contrlloop.queueholder.equals(result?.healthdeDatial?.healthCenterUID))
 
+                   if(individualQueuesViewModel.contrlloop.queueholder.equals("")){
+                       buttonstatus=true
+                   }
 
                     Row() {
-                        Text(text = currentnumber)
+                        Text(text = currentnumber.toString())
 
                         Text(text = " persons has entered the queue")
                     }
                     Row() {
                         Text(text = queueopenunit.QueueCapacity.toString())
-                        Text(text = " Maximum mumber of queue")
+                        Text(text = " Maximum number  of queue")
                     }
                     Row() {
                         Text(text = queueopenunit.Avgqueuetime)
@@ -118,9 +119,11 @@ fun setupupdates(result:IndividualHealthCenterContainer?,individualQueuesViewMod
                         }
                         if(buu==2){
                             Toast.makeText(context,"You have been Joined the Queue", Toast.LENGTH_SHORT).show()
+                            buu=7
                         }
                         if (buu==3){
                             Toast.makeText(context,"You have been Dequeue", Toast.LENGTH_SHORT).show()
+                            buu=7
                         }
 
 
@@ -144,18 +147,16 @@ fun setupupdates(result:IndividualHealthCenterContainer?,individualQueuesViewMod
                         Button( modifier = Modifier.align(Alignment.CenterHorizontally),
                             onClick = {
                                 if(buttontext=="JOIN"){
-                                    currentnumber=(queueopenunit.currentnumber+1).toString()
+
                                     individualQueuesViewModel.callAddMessage("TESTING")
                                     buttontext="CANCEL"
-                                    Toast.makeText(context,"You have Entered the Queue", Toast.LENGTH_SHORT).show()
-
 
 
                                 }
                                 else {
+                                    individualQueuesViewModel.calldequeue("TESTING")
                                     buttontext="JOIN"
-                                    currentnumber=(queueopenunit.currentnumber).toString()
-                                    Toast.makeText(context,"You have been Left the Queue", Toast.LENGTH_SHORT).show()    }
+                                }
                             },
                             colors = ButtonDefaults.buttonColors(backgroundColor = JoinButtonColor)
                         ) {

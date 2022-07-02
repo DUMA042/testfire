@@ -104,6 +104,9 @@ fun setupinqueuelister(){
             }
 
 }
+
+
+
     //----------------------For the Inqueue chech also use for circular spinner-----------------
 
     fun setupopenqueues(currenthealthcenter:String?){
@@ -144,7 +147,32 @@ fun setupinqueuelister(){
 
     }
     //----------------------------------------------------------------------------------
+//--------------------------------For Cloud functions--------------------------------
+    private fun addDequeue(text: String): Task<String> {
+        // Create the arguments to the callable function.
+        val data = hashMapOf(
+            "healthcenterid" to "ROXlJPAtUX0ja6dOzrrG",
+            "queueopenid" to "yJH7RhSuAlktmnBcTz5k",
+            "patientid" to "IFruEGQLXKUlkZPJrXuMqIzZJY23"
+        )
 
+        return functions
+            .getHttpsCallable("dequeue")
+            .call(data)
+            .continueWith { task ->
+                // This continuation runs on either success or failure, but if the task
+                // has failed then result will throw an Exception which will be
+                // propagated down.
+                val result = task.result?.data as String
+                result
+            }
+
+    }
+
+
+
+
+//----------------------------------------------------------------------------------
 
     //--------------------------------For Cloud functions--------------------------------
     private fun addPatientToqueue(text: String): Task<String> {
@@ -170,6 +198,27 @@ fun setupinqueuelister(){
     }
 
     //----------------------------------------------------------------------------------
+    //--------------------------------------Also for functions Dequeue-------------------------
+    fun calldequeue(inputMessage: String){
+        // [START call_add_message]
+        simfor=0
+        addDequeue(inputMessage)
+            .addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    val e = task.exception
+                    if (e is FirebaseFunctionsException) {
+                        val code = e.code
+                        val details = e.details
+                    }
+                }
+
+            }
+
+        //callAddon("addMessage")
+        // [END call_add_message]
+    }
+
+    //-----------------------------------------------------------------------------------------
 
     //--------------------------------------Also for functions-------------------------
     fun callAddMessage(inputMessage: String){
