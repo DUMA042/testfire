@@ -81,8 +81,9 @@ fun RowScope.AddItem(screen: NavScreens, currentDestination: NavDestination?, na
 
 @Composable
 fun HomeScreen(auth: FirebaseAuth?,onSignOut:()->Unit,simdemo: demoView = viewModel()){
-    var checknewuser=simdemo.notreqistered
     simdemo.checkifitnewuser(auth)
+    var checknewuser=simdemo.notreqistered
+
     if(checknewuser==1){
         Text(text = "New User")
     }
