@@ -39,6 +39,8 @@ import com.google.firebase.auth.FirebaseAuth
 import androidx.compose.foundation.Image
 import com.example.testfire.UseCases.IndividualHealthCenterContainer
 import com.example.testfire.ui.theme.HealthCenterSurfaceColor
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 @Composable
 fun PatientHomeScreenStatefull(auth: FirebaseAuth?, onSignOut:()->Unit, navController: NavController, patientDetailViewModel: PatientDetailViewModel= viewModel()){
@@ -201,7 +203,7 @@ MessageRow(message)
    }**/
 
     Button(onClick = {
-       // Firebase.auth.signOut()
+        Firebase.auth.signOut()
        // onSignOut()
         ff.callAddMessage("Working good")
        }) {
