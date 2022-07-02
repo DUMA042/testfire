@@ -258,7 +258,7 @@ fun Greeting(auth: FirebaseAuth?, context:ComponentActivity,authViewModel:AuthVi
     }
     else{
 
-        buildUI(onClick = { authResultLauncher.launch(RC_SIGN_IN)})
+        buildUI(onClick = {authResultLauncher.launch(RC_SIGN_IN)})
     }
 
 

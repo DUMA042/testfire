@@ -19,6 +19,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.testfire.NavComponent.NavTypes.NavScreens
 import com.example.testfire.UIElement.PatientUIForVacineQ.PatientHomeScreenStatefull
 import com.example.testfire.UIElement.PatientUIForVacineQ.displayq
+import com.example.testfire.demoView
 import com.example.testfire.demoqueueview
 import com.google.firebase.auth.FirebaseAuth
 
@@ -79,8 +80,17 @@ fun RowScope.AddItem(screen: NavScreens, currentDestination: NavDestination?, na
 }
 
 @Composable
-fun HomeScreen(auth: FirebaseAuth?,onSignOut:()->Unit){
-    PatientHomeScreenStatefull(auth,onSignOut)
+fun HomeScreen(auth: FirebaseAuth?,onSignOut:()->Unit,simdemo: demoView = viewModel()){
+    var checknewuser=simdemo.notreqistered
+    simdemo.checkifitnewuser(auth)
+    if(checknewuser==1){
+        Text(text = "New User")
+    }
+    else{
+        PatientHomeScreenStatefull(auth,onSignOut,)
+    }
+
+
 }
 
 

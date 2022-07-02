@@ -34,6 +34,7 @@ import com.google.firebase.ktx.Firebase
 fun PatientHomeScreenStatefull(auth: FirebaseAuth?,onSignOut:()->Unit,simdemo:demoView= viewModel()){
     var controlsim =simdemo.simfor
     var controlincrease=simdemo.simincrease
+
     var Nametext by remember { mutableStateOf("") }
     var Capacitytext by remember { mutableStateOf("") }
     var Descriptiontext by remember { mutableStateOf("") }
@@ -42,6 +43,8 @@ fun PatientHomeScreenStatefull(auth: FirebaseAuth?,onSignOut:()->Unit,simdemo:de
     var queuelist: MutableList<String> = mutableListOf("VAc", "Work", "Time")
     var creatingqueue by remember{mutableStateOf(-1)}
     var numbertime by  remember{mutableStateOf(0)}
+
+
     
     Column(modifier = Modifier.fillMaxSize(),verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
 if(creatingqueue==-1){
