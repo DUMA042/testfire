@@ -97,6 +97,7 @@ fun setupinqueuelister(){
                     if(contrlloop.inqueue){
                         simfor=2
                     }
+
                     //patientInfodetailsobject= it.toObject(PatientPublicInfo::class.java)!!
                     //Log.d(ContentValues.TAG, "This is for the object: $patientInfodetailsobject")
                 }

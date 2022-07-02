@@ -27,6 +27,7 @@ import com.example.testfire.ViewModels.HealthCenterIndividualQueuesViewModel
 import com.example.testfire.ViewModels.PatientDetailViewModel
 import com.example.testfire.ui.theme.JoinButtonColor
 import com.example.testfire.ui.theme.OpenQueueSurfaceColor
+import com.example.testfire.ui.theme.ViewCenterInfoColor
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 
@@ -62,7 +63,7 @@ fun setupupdates(result:IndividualHealthCenterContainer?,individualQueuesViewMod
     else{
         Column(verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally) {
-            Card(elevation = 12.dp) {
+            Card(elevation = 12.dp, backgroundColor = ViewCenterInfoColor) {
                 Column() {
 
                     Text(text = "NAME "+ (result?.healthdeDatial?.Name ?: null))
@@ -74,7 +75,12 @@ fun setupupdates(result:IndividualHealthCenterContainer?,individualQueuesViewMod
                 }
             }
 
-            Card() {
+            Card(modifier = Modifier
+                .height(250.dp)
+                .padding(8.dp),
+                elevation = 3.dp,
+                shape = RoundedCornerShape(8.dp),
+                backgroundColor = OpenQueueSurfaceColor) {
                 Column() {
                     Text(queueopenunit.QueueName, modifier = Modifier.align(Alignment.CenterHorizontally))
 
